@@ -1,19 +1,17 @@
 # from rest_framework.viewsets import ModelViewSet
-# from .serializers import EtudiantSerializer, InscriptionSerializer
+# from .serializers import EtudiantSerializer
 # from rest_framework.decorators import api_view, permission_classes
 # from rest_framework.response import Response
-# from .models import Etudiant, Inscription, Classe
+# from .models import Etudiant
 # import django_filters.rest_framework
 # from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
 
 
 
 # #Vues API
 
-# #API GET POUR OBTENIR LES INFOS DES ETUDIANTS 
+# #API GET POUR OBTENIR LES INFOS DE TOUS LES ETUDIANTS 
 
 # class etudiantViewSet(ModelViewSet):
 #     queryset=Etudiant.objects.all()

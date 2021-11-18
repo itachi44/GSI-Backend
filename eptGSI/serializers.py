@@ -6,7 +6,7 @@ from rest_framework import serializers
 
     #class Meta:
         #model=Etudiant
-        #fields=("nom","prenom","email","date_naissance","lieu_naissance")
+        #fields=("nom","prenom","email","date_naissance","lieu_naissance") #ou bien '__all__'
 
 
 
