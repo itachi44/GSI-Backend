@@ -1,18 +1,29 @@
-# from django.contrib import admin
+from django.contrib import admin
 
 # # Register your models here.
 
-# #from .models import User, Etudiant, Departement, Professeur, Matiere,Classe,UE_matiere, Inscription
+from .models import Etudiant, Membre, Compte
 
 
 # ############################################# affichage indépendamment des relations ##################################################
 
 
-# @admin.register(User)
-# class UserAdmin(admin.ModelAdmin):
-#     list_display = ('nom', 'prenom','email')
-#     search_fields=['nom', 'prenom','email']
-    
+@admin.register(Etudiant)
+class EtudiantAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Membre)
+class MembreAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Compte)
+class CompteAdmin(admin.ModelAdmin):
+    pass
+
+
+
+
+
 # @admin.register(Etudiant)
 # class EtudiantAdmin(admin.ModelAdmin):
 #     list_display = ('nom', 'prenom','email','date_naissance','lieu_naissance')

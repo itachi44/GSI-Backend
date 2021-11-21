@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import dj_database_url
 import os
+import djongo
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +46,8 @@ INSTALLED_APPS = [
     'eptGSI.apps.EptgsiConfig',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders'
+    'corsheaders',
+    'django_filters'
 
 ]
 
@@ -103,11 +105,13 @@ DATABASES = {
             'NAME': 'gsi',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
-                'host': "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false"
+                'host': 'mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false'
             }  
         }
 }
 
+
+BASE_URL="http://127.0.0.1:8000/"
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -127,6 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+UPLOADED_FILES_USE_URL = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -150,7 +155,6 @@ STATIC_URL = '/static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PROJECT_DIR = os.path.dirname(__file__) 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))

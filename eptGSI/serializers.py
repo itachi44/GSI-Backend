@@ -1,12 +1,24 @@
 from rest_framework import serializers 
-#from .models import 
+from .models import Etudiant, Membre, Compte
 
 
-#class EtudiantSerializer(serializers.ModelSerializer):
-
-    #class Meta:
-        #model=Etudiant
-        #fields=("nom","prenom","email","date_naissance","lieu_naissance") #ou bien '__all__'
-
+class CompteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Compte
+        fields='__all__'
 
 
+class MembreSerializer(serializers.ModelSerializer):
+    compte = CompteSerializer()
+
+    class Meta:
+        model=Membre
+        fields='__all__'
+
+
+class EtudiantSerializer(serializers.ModelSerializer):
+    membre = MembreSerializer()
+
+    class Meta:
+        model=Etudiant
+        fields=["niveau_etude","adresse","cv","membre"]
