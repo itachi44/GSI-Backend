@@ -27,3 +27,22 @@ class etudiantViewSet(ModelViewSet):
         if etudiant_id is not None:
             queryset = queryset.filter(id=etudiant_id)
         return queryset
+    
+
+    #modifier les informations personnelles
+    # @transaction.atomic
+    # @action(detail=True, methods=['post'])
+    # def updatePersonalInfos(self, request, pk):
+    #     # une transaction atomique car plusieurs requêtes vont être exécutées
+    #     # en cas d'erreur, nous retrouverions alors l'état précédent
+
+    #     # Désactivons la catégorie
+    #     category = self.get_object()
+    #     category.active = False
+    #     category.save()
+
+    #     # Puis désactivons les produits de cette catégorie
+    #     category.products.update(active=False)
+
+    #     # Retournons enfin une réponse (status_code=200 par défaut) pour indiquer le succès de l'action
+    #     return Response()
