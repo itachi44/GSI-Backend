@@ -42,9 +42,9 @@ class EtudiantSerializer(serializers.ModelSerializer):
         print(validated_data)
         membre = validated_data.pop('membre')
         print(membre)
-        # etudiant = Etudiant.objects.create(**validated_data)
+        etudiant= Etudiant.objects.create(**validated_data)
         # for track_data in tracks_data:
         #     Track.objects.create(album=album, **track_data)
-        # return album
+        return etudiant
     def update(self, instance, validated_data):
         print(validated_data)
