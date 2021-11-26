@@ -1,7 +1,6 @@
 from django.db import models
 from djongo.storage import GridFSStorage
 from django.conf import settings
-from djangotoolbox.fields import ListField
 
 
 
@@ -13,16 +12,17 @@ rapport_grid_fs_storage = GridFSStorage(collection='rapports', base_url=''.join(
 
 
 class Compte(models.Model):
-    identifiant = models.CharField(max_length=100)
+    identifiant = models.CharField(max_length=100,unique=True)
     mot_de_passe = models.CharField(max_length=100)
 
 class Membre(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
-    telephone = models.CharField(max_length=20)
+    email = models.EmailField(max_length=100,unique=True)
+    telephone = models.CharField(max_length=20, unique=True)
     compte = models.ForeignKey(Compte,related_name="Compte",blank=True,
         null=True, on_delete=models.CASCADE)
+
     def __str__(self):
         return str(self.prenom + ' '+ self.nom )
 
@@ -71,7 +71,7 @@ class Etudiant(models.Model):
     membre = models.ForeignKey(Membre,related_name="Membre",blank=True,
         null=True, on_delete=models.CASCADE)
     planning = models.ForeignKey(Planning, related_name="planning", blank = True, null = True, on_delete=models.CASCADE)
-    immersion = models.ForeignKey(Immersion, related_name = "Immersion", on_delete=models.PROTECT)
+    immersion = models.ForeignKey(Immersion, related_name = "Immersion",blank = True, null = True, on_delete=models.PROTECT)
     rapport_stage = models.FileField(upload_to='rapports', storage=rapport_grid_fs_storage, null=True,blank = True)
 
     def __str__(self):
@@ -84,11 +84,15 @@ class Entreprise(models.Model):
     domaine_expertise = models.CharField(max_length=100)
 
 
+class Destinataire(models.Model):
+    label=models.CharField(max_length=100)
+
+
 class Evenement(models.Model):
     details = models.TextField()
     intitule = models.CharField(max_length=100)
     date = models.DateField()
-    destinataires = models.ListField()
+    destinataire=models.ManyToManyField(Destinataire)
 
 
 class MembreDept(models.Model):
@@ -118,4 +122,3 @@ class Evaluation(models.Model):
     appreciation = models.TextField()
     etudiant = models.ForeignKey(Etudiant, related_name = "Evaluation", on_delete=models.PROTECT)
     maitre_de_stage = models.ForeignKey(MaitreStage, related_name = "Evaluation", on_delete = models.PROTECT)
-
