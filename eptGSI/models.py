@@ -12,67 +12,29 @@ rapport_grid_fs_storage = GridFSStorage(collection='rapports', base_url=''.join(
 
 
 class Compte(models.Model):
-    identifiant = models.CharField(max_length=100,unique=True)
+    identifiant = models.CharField(max_length=100)
     mot_de_passe = models.CharField(max_length=100)
+
 
 class Membre(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100,unique=True)
-    telephone = models.CharField(max_length=20, unique=True)
-    compte = models.ForeignKey(Compte,related_name="Compte",blank=True,
+    email = models.EmailField(max_length=100)
+    telephone = models.CharField(max_length=20)
+    compte = models.ForeignKey(Compte,related_name="Membre",blank=True,
         null=True, on_delete=models.CASCADE)
-
+    
     def __str__(self):
         return str(self.prenom + ' '+ self.nom )
-
-
-class Programme(models.Model):
-    pass
-
-class Planning(models.Model):
-    pass
-
-
-class Projet(models.Model):
-    nom_projet = models.CharField(max_length=100)
-    descriptif_projet = models.TextField()
-    programme = models.ForeignKey(Programme, related_name = "Programme", on_delete=models.PROTECT)
-    planning = models.ForeignKey(Planning, related_name = "Planning", on_delete=models.PROTECT)
-
-
-class Tache(models.Model):
-    intitule = models.CharField(max_length=100)
-    projet = models.ForeignKey(Projet, related_name = "Projet", on_delete=models.PROTECT)
-
-
-class SousTache(models.Model):
-    nom_tache = models.CharField(max_length=100)
-    echeance = models.DateField()
-    date_debut = models.DateField()
-    date_fin = models.DateField()
-    descriptif = models.TextField()
-    commentaire = models.TextField()
-    etat = models.BooleanField(default = False)
-    tache = models.ForeignKey(Tache, related_name = "Tache", on_delete=models.PROTECT)
-
-class Immersion(models.Model):
-    description = models.TextField()
-    annee = models.CharField(max_length=100)
-    date_debut = models.DateField()
-    date_fin = models.DateField()
-    programme = models.ForeignKey(Programme, related_name = "Immersion", blank = True, null = True, on_delete=models.CASCADE)
 
 
 class Etudiant(models.Model):
     niveau_etude = models.CharField(max_length = 100)
     adresse = models.CharField(max_length=100)
-    cv = models.FileField(upload_to='cvs', storage=cv_grid_fs_storage)
-    membre = models.ForeignKey(Membre,related_name="Membre",blank=True,
+    cv = models.FileField(upload_to='cvs', storage=cv_grid_fs_storage,blank=True,
+        null=True)
+    membre = models.ForeignKey(Membre,related_name="Etudiant",blank=True,
         null=True, on_delete=models.CASCADE)
-    planning = models.ForeignKey(Planning, related_name="planning", blank = True, null = True, on_delete=models.CASCADE)
-    immersion = models.ForeignKey(Immersion, related_name = "Immersion",blank = True, null = True, on_delete=models.PROTECT)
-    rapport_stage = models.FileField(upload_to='rapports', storage=rapport_grid_fs_storage, null=True,blank = True)
 
     def __str__(self):
         return str(self.membre.prenom + ' '+ self.membre.nom )
@@ -83,6 +45,72 @@ class Entreprise(models.Model):
     localisation = models.CharField(max_length=100)
     domaine_expertise = models.CharField(max_length=100)
 
+  
+class Programme(models.Model):
+    pass
+    
+      
+class Immersion(models.Model):
+    description = models.TextField()
+    date_debut = models.DateField()
+    date_fin = models.DateField()
+    entreprise= models.ForeignKey(Entreprise, related_name="Immersion",blank=True,
+        null=True, on_delete=models.CASCADE)
+    programme = models.ForeignKey(Programme, related_name="Immersion",blank=True,
+        null = True, on_delete=models.CASCADE)
+
+
+class Stage(models.Model):
+    annee = models.CharField(max_length=100)
+    date_debut = models.DateField()
+    date_fin = models.DateField()
+    rapport_stage = models.FileField(upload_to='rapports', storage=rapport_grid_fs_storage)
+    etudiant = models.ForeignKey(Etudiant, related_name="Stage",blank= True,
+        null=True, on_delete=models.CASCADE)
+    immersion = models.ForeignKey(Immersion, related_name="Stage",blank= True,
+        null=True, on_delete=models.CASCADE)
+
+
+class MaitreStage(models.Model):
+    membre = models.ForeignKey(Membre, related_name = "MaitreStage",blank=True,
+        null=True, on_delete=models.CASCADE)
+
+
+class Planning(models.Model):
+    annee = models.CharField(max_length=100)
+    etudiant = models.ForeignKey(Etudiant, related_name="Planning",blank=True,
+        null= True, on_delete=models.CASCADE)
+    maitreStage = models.ForeignKey(MaitreStage, related_name="Planning",blank=True,
+        null= True, on_delete=models.CASCADE)
+    
+    
+class Projet(models.Model):
+    nom_projet = models.CharField(max_length=100)
+    descriptif_projet = models.TextField()
+    etat = models.CharField(max_length=100)
+    programme = models.ForeignKey(Programme, related_name = "Projet",blank=True,
+        null=True, on_delete=models.PROTECT)
+    planning = models.ForeignKey(Planning, related_name = "Projet",blank=True,
+        null=True, on_delete=models.PROTECT)
+
+
+class Tache(models.Model):
+    intitule = models.CharField(max_length=100)
+    projet = models.ForeignKey(Projet, related_name = "Tache",blank=True,
+        null=True,on_delete=models.PROTECT)
+
+
+class SousTache(models.Model):
+    nom_tache = models.CharField(max_length=100)
+    echeance = models.DateField()
+    date_debut = models.DateField()
+    date_fin = models.DateField()
+    descriptif = models.TextField()
+    commentaire = models.TextField()
+    etat = models.BooleanField(default = False)
+    tache = models.ForeignKey(Tache, related_name = "SousTache",blank=True,
+        null=True, on_delete=models.PROTECT)
+
 
 class Destinataire(models.Model):
     label=models.CharField(max_length=100)
@@ -92,33 +120,35 @@ class Evenement(models.Model):
     details = models.TextField()
     intitule = models.CharField(max_length=100)
     date = models.DateField()
-    destinataire=models.ManyToManyField(Destinataire)
+    destinataires = models.ManyToManyField(Destinataire)
 
 
 class MembreDept(models.Model):
-    membre = models.ForeignKey(Membre, related_name = "MembreDept" , on_delete=models.CASCADE)
-
-
-class MaitreStage(models.Model):
-    membre = models.ForeignKey(Membre, related_name = "MaitreStage", on_delete=models.CASCADE)
-    planning = models.ForeignKey(Planning, related_name = "MaitreStage", blank = True, null = True, on_delete=models.PROTECT)
+    membre = models.ForeignKey(Membre, related_name = "MembreDept",blank=True,
+        null=True, on_delete=models.CASCADE)
 
 
 class RespEntreprise(models.Model): 
-    membre = models.ForeignKey(Membre, related_name = "RespEntreprise", on_delete=models.CASCADE)
+    membre = models.ForeignKey(Membre, related_name = "RespEntreprise",blank=True,
+        null=True, on_delete=models.CASCADE)
 
 
 class ChefDept(models.Model):
-    membre = models.ForeignKey(Membre, related_name = "ChefDept", on_delete=models.CASCADE)
+    membre = models.ForeignKey(Membre, related_name = "ChefDept",blank=True,
+        null=True, on_delete=models.CASCADE)
+
 
 class Message(models.Model):
     intitule = models.CharField(max_length=100)
     contenu = models.TextField()
-    etudiant = models.ForeignKey(Etudiant, related_name = "Message", on_delete=models.PROTECT)
+    etudiant = models.ForeignKey(Etudiant, related_name = "Message",blank=True,
+        null=True, on_delete=models.PROTECT)
 
 
 class Evaluation(models.Model):
     note_evaluation = models.FloatField()
     appreciation = models.TextField()
-    etudiant = models.ForeignKey(Etudiant, related_name = "Evaluation", on_delete=models.PROTECT)
-    maitre_de_stage = models.ForeignKey(MaitreStage, related_name = "Evaluation", on_delete = models.PROTECT)
+    etudiant = models.ForeignKey(Etudiant, related_name = "Evaluation",blank=True,
+        null=True, on_delete=models.PROTECT)
+    maitre_de_stage = models.ForeignKey(MaitreStage, related_name = "Evaluation",blank=True,
+        null=True, on_delete = models.PROTECT)

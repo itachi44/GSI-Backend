@@ -25,10 +25,20 @@ class MembreSerializer(serializers.ModelSerializer):
         }
 
 
-    # def validate_email(self, value):
-    #     if Membre.objects.filter(email=value).exists():
-    #         raise serializers.ValidationError('Membre already exists')
-    #     return value
+    def update(self, instance, validated_data):
+        compte_data = validated_data.pop('compte')
+        compte = instance.compte         
+        instance.nom = validated_data.get('nom', instance.nom)
+        instance.prenom = validated_data.get('prenom', instance.prenom)
+        instance.email = validated_data.get('email', instance.email)
+        instance.telephone = validated_data.get('telephone', instance.telephone)
+        instance.save()
+        
+        compte.identifiant = compte_data.get('identifiant', compte.identifiant)
+        compte.mot_de_passe = compte_data.get('identifiant', compte.mot_de_passe)
+        compte.save()
+        
+        return instance
 
 
 class EtudiantSerializer(serializers.ModelSerializer):
@@ -39,12 +49,37 @@ class EtudiantSerializer(serializers.ModelSerializer):
         fields=["niveau_etude","adresse","cv","membre"]
 
     def create(self, validated_data):
-        print(validated_data)
         membre = validated_data.pop('membre')
-        print(membre)
-        etudiant= Etudiant.objects.create(**validated_data)
-        # for track_data in tracks_data:
-        #     Track.objects.create(album=album, **track_data)
+        compte= membre.pop('compte')
+        email=membre["email"]
+        telephone=membre["telephone"]
+        identifiant=compte["identifiant"]
+        if Membre.objects.filter(email=email).exists() :
+            raise serializers.ValidationError('Ce membre existe déja')
+            return email
+        if Membre.objects.filter(telephone=telephone).exists():
+            raise serializers.ValidationError('Ce membre existe déja')
+            return telephone
+        if Compte.objects.filter(identifiant=identifiant).exists():
+            raise serializers.ValidationError('Ce compte existe déja')
+            return identifiant
+        #TODO : lever des exceptions pour les champs uniques
+        compte=Compte.objects.create(**compte)
+        membre=Membre.objects.create(compte=compte,**membre)
+        etudiant= Etudiant.objects.create(membre=membre,**validated_data)
+
         return etudiant
-    def update(self, instance, validated_data):
-        print(validated_data)
+
+    def update(self, instance, validated_data):        
+        membre_data = validated_data.pop('membre')
+        membre_serializer = MembreSerializer(data = membre_data)        
+        instance.niveau_etude = validated_data.get('niveau_etude', instance.niveau_etude)
+        instance.adresse = validated_data.get('adresse', instance.adresse)
+        if instance.cv:
+            instance.cv.delete()
+        instance.cv = validated_data.get('cv', instance.cv)
+        instance.save()
+        if membre_serializer.is_valid():
+            membre = membre_serializer.update(instance=instance.membre, validated_data=membre_serializer.validated_data)
+
+        return instance
