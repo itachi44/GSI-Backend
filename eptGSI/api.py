@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from .serializers import EtudiantSerializer
+from .serializers import EtudiantSerializer, MembreSerializer, CompteSerializer, EntrepriseSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Etudiant, Membre, Compte
@@ -11,19 +11,9 @@ from rest_framework.decorators import action
 from django.http import Http404
 from rest_framework import status
 
-
-
-
-
-
-
-#return Response(data)
-#Tutorial.objects.get(pk=pk) 
-
-
 #Vues API
 
-class etudiantViewSet(ModelViewSet):
+class EtudiantViewSet(ModelViewSet):
     serializer_class= EtudiantSerializer
     #permission_classes=(IsAuthenticated,)
     filter_fields=["niveau_etude"]
@@ -48,36 +38,52 @@ class etudiantViewSet(ModelViewSet):
 
 
         
+class MembreViewSet(ModelViewSet):
+    serializer_class= MembreSerializer
+    #permission_classes=(IsAuthenticated,)
+    filter_fields=["nom","prenom"]
 
-    # #mixin pour modifier les informations personnelles de l'étudiant
-    # # => detail =True
-    # @transaction.atomic
-    # @action(detail=True, methods=['put','patch'])
-    # def updatePersonalInfos(self, request, pk):
-    #     # une transaction atomique car plusieurs requêtes vont être exécutées
-    #     # en cas d'erreur, nous retrouverions alors l'état précédent
+    def get_queryset(self):
+        queryset= Membre.objects.all()
+    
+        membre_id = self.request.GET.get('id_membre')
+        if membre_id is not None:
+            queryset = queryset.filter(id=membre_id)
+        return queryset
+    
 
-    #     # récupérons l'étudiant 
-    #     etudiant = self.get_object()
-    #     # récupération des données 
-    #     serializer = EtudiantSerializer(data=request.data)
-    #     #validation test
-    #     if serializer.is_valid():
-    #         data=request.data
-    #         print(data)
-    #         if data[""]:
-    #             etudiant.niveau_etude=data[""]
-    #         if data[""]:
-    #             etudiant.adresse=data[""]
-    #         if data[""]
+    def destroy(self, request, *args, **kwargs):
+        membre=self.get_object()
+        print(membre)
+        Compte.objects.filter(identifiant=membre.compte.identifiant).delete()
+        membre.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-    #         etudiant.save()
-    #         return Response({'status': 'updated'})
-    #     else:
-    #         return Response(serializer.errors,
-    #                         status=status.HTTP_400_BAD_REQUEST)
+
+class CompteViewSet(ModelViewSet):
+    serializer_class= CompteSerializer
+    #permission_classes=(IsAuthenticated,)
+    filter_fields=["identifiant"]
+
+    def get_queryset(self):
+        queryset= Compte.objects.all()
+    
+        compte_id = self.request.GET.get('id_compte')
+        if compte_id is not None:
+            queryset = queryset.filter(id=compte_id)
+        return queryset
 
 
-    #     # Retournons enfin une réponse (status_code=200 par défaut) pour indiquer le succès de l'action
-    #     return Response()
+class EntrepriseViewSet(ModelViewSet):
+    serializer_class= EntrepriseSerializer
+    #permission_classes=(IsAuthenticated,)
+    filter_fields=["nom_entreprise"]
+
+    def get_queryset(self):
+        queryset= Entreprise.objects.all()
+    
+        entreprise_id = self.request.GET.get('id_entreprise')
+        if entreprise_id is not None:
+            queryset = queryset.filter(id=entreprise_id)
+        return queryset

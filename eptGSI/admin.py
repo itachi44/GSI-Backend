@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # # Register your models here.
 
-from .models import Etudiant, Membre, Compte
+from .models import Etudiant, Membre, Compte,Entreprise, Programme
 
 
 # ############################################# affichage indépendamment des relations ##################################################
@@ -20,7 +20,13 @@ class MembreAdmin(admin.ModelAdmin):
 class CompteAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(Entreprise)
+class CompteAdmin(admin.ModelAdmin):
+    pass
 
+@admin.register(Programme)
+class CompteAdmin(admin.ModelAdmin):
+    pass
 
 
 
