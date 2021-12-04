@@ -16,7 +16,7 @@ from rest_framework import status
 class EtudiantViewSet(ModelViewSet):
     serializer_class= EtudiantSerializer
     #permission_classes=(IsAuthenticated,)
-    filter_fields=["niveau_etude"]
+    filter_fields=["niveau_etude","membre"]
 
     def get_queryset(self):
         queryset= Etudiant.objects.all()
@@ -73,6 +73,28 @@ class CompteViewSet(ModelViewSet):
         if compte_id is not None:
             queryset = queryset.filter(id=compte_id)
         return queryset
+
+
+
+class ImmersionViewSet(ModelViewSet):
+    serializer_class= ImmersionSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Immersion.objects.all()
+    
+        immersion_id = self.request.GET.get('id_immersion')
+        if immersion_id is not None:
+            queryset = queryset.filter(id=immersion_id)
+        return queryset
+    
+
+    def destroy(self, request, *args, **kwargs):
+        immersion=self.get_object()
+        Programme.objects.filter(id=immersion.programme.id).delete()
+        immersion.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 
 class EntrepriseViewSet(ModelViewSet):
@@ -133,4 +155,17 @@ class MaitreStageViewSet(ModelViewSet):
         maitre_stage_id = self.request.GET.get('id_maitre_stage')
         if maitre_stage_id is not None:
             queryset = queryset.filter(id=maitre_stage_id)
+        return queryset
+
+
+class PlanningViewSet(ModelViewSet):
+    serializer_class= PlanningSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Planning.objects.all()
+    
+        planning_id = self.request.GET.get('id_planning')
+        if planning_id is not None:
+            queryset = queryset.filter(id=planning_id)
         return queryset

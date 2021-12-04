@@ -77,7 +77,7 @@ class MaitreStage(models.Model):
 
 
 class Planning(models.Model):
-    annee = models.CharField(max_length=100)
+    annee = models.DateField()
     etudiant = models.ForeignKey(Etudiant, related_name="Planning",blank=True,
         null= True, on_delete=models.CASCADE)
     maitreStage = models.ForeignKey(MaitreStage, related_name="Planning",blank=True,

@@ -117,7 +117,33 @@ class ProgrammeSerializer(serializers.ModelSerializer):
         model=Programme
         fields="__all__"
 
-#immersion (Fary)
+
+class ImmersionSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Immersion
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        entreprise = validated_data.pop('entreprise')
+        programme= validated_data.pop('programme')
+        immersion= Immersion.objects.create(entreprise=entreprise,programme=programme,**validated_data)
+
+        return immersion
+
+    def update(self, instance, validated_data,*args, **kwargs):       
+              
+        instance.description = validated_data.get('description', instance.description)
+        instance.date_debut = validated_data.get('date_debut', instance.date_debut)
+        instance.date_fin = validated_data.get('date_fin', instance.date_fin)
+        instance.entreprise=validated_data.get('entreprise', instance.entreprise)
+        instance.programme=validated_data.get('programme', instance.programme)
+        instance.save()
+        
+        return instance
+    
+
 
 class StageSerializer(serializers.ModelSerializer):
 
@@ -199,7 +225,6 @@ class MaitreStageSerializer(serializers.ModelSerializer):
         return instance
 
 
-##here
 class PlanningSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -208,27 +233,46 @@ class PlanningSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        print(validated_data)
         etudiant = validated_data.pop('etudiant')
-        immersion= validated_data.pop('immersion')
-        if Stage.objects.filter(etudiant=etudiant, annee=validated_data["annee"]).exists() :
-            raise serializers.ValidationError('Ce stage existe déja')
-            return email
-        stage = Stage.objects.create(etudiant=etudiant,immersion=immersion,**validated_data)
+        maitre_stage= validated_data.pop('maitreStage')
+        if Planning.objects.filter(etudiant=etudiant, annee=validated_data["annee"], maitreStage=maitre_stage).exists() :
+            raise serializers.ValidationError('Ce Planning existe déja')
+            return validated_data
+        planning = Planning.objects.create(etudiant=etudiant,maitreStage=maitre_stage,**validated_data)
 
-        return stage
+        return planning
 
     def update(self, instance, validated_data,*args, **kwargs):        
         instance.annee = validated_data.get('annee', instance.annee)
-        instance.date_debut= validated_data.get('date_debut', instance.date_debut)
-        instance.date_fin= validated_data.get('date_fin', instance.date_fin)
         instance.etudiant= validated_data.get('etudiant', instance.etudiant)
-        instance.immersion= validated_data.get('immersion', instance.immersion)
+        instance.maitreStage= validated_data.get('maitreStage', instance.maitreStage)
+
+        instance.save()
+        return instance
 
 
-        if instance.rapport_stage:
-            instance.rapport_stage.delete()
-        instance.rapport_stage = validated_data.get('rapport_stage', instance.rapport_stage)
+class ProjetSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Projet
+        fields="__all__"
 
+
+    def create(self, validated_data):
+        programme = validated_data.pop('programme')
+        planning= validated_data.pop('planning')
+        if Projet.objects.filter(etudiant=programme, nom_projet=validated_data["nom_projet"],planning=planning).exists() :
+            raise serializers.ValidationError('Ce Planning existe déja')
+            return validated_data
+        planning = Planning.objects.create(etudiant=etudiant,maitreStage=maitre_de_stage,**validated_data)
+
+        return planning
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.annee = validated_data.get('annee', instance.annee)
+        instance.etudiant= validated_data.get('etudiant', instance.etudiant)
+        instance.maitreStage= validated_data.get('maitreStage', instance.maitreStage)
 
         instance.save()
         return instance
