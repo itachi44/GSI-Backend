@@ -188,7 +188,8 @@ class MaitreStageSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        compte = validated_data.pop('compte')
+        print(validated_data)
+        membre = validated_data.pop('membre')
         email=validated_data.get("email")
         telephone=validated_data.get("telephone")
         identifiant=validated_data.get("identifiant")
@@ -233,7 +234,6 @@ class PlanningSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        print(validated_data)
         etudiant = validated_data.pop('etudiant')
         maitre_stage= validated_data.pop('maitreStage')
         if Planning.objects.filter(etudiant=etudiant, annee=validated_data["annee"], maitreStage=maitre_stage).exists() :
@@ -262,19 +262,71 @@ class ProjetSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         programme = validated_data.pop('programme')
         planning= validated_data.pop('planning')
-        if Projet.objects.filter(etudiant=programme, nom_projet=validated_data["nom_projet"],planning=planning).exists() :
-            raise serializers.ValidationError('Ce Planning existe déja')
+        if Projet.objects.filter(nom_projet=validated_data["nom_projet"], descriptif_projet=validated_data["descriptif_projet"]).exists() :
+            raise serializers.ValidationError('Ce Projet existe déja')
             return validated_data
-        planning = Planning.objects.create(etudiant=etudiant,maitreStage=maitre_de_stage,**validated_data)
+        projet = Projet.objects.create(programme=programme,planning=planning,**validated_data)
 
         return planning
 
     def update(self, instance, validated_data,*args, **kwargs):        
-        instance.annee = validated_data.get('annee', instance.annee)
-        instance.etudiant= validated_data.get('etudiant', instance.etudiant)
-        instance.maitreStage= validated_data.get('maitreStage', instance.maitreStage)
+        instance.nom_projet = validated_data.get('nom_projet', instance.nom_projet)
+        instance.descriptif_projet= validated_data.get('descriptif_projet', instance.descriptif_projet)
+        instance.etat= validated_data.get('etat', instance.etat)
+        instance.programme = validated_data.get('programme', instance.programme)
+        instance.planning= validated_data.get('planning', instance.planning)
 
         instance.save()
         return instance
 
 
+class TacheSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Tache
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        projet = validated_data.pop('projet')
+        if Tache.objects.filter(intitule=validated_data["intitule"],projet=projet).exists() :
+            raise serializers.ValidationError('Cette tache existe déja')
+            return validated_data
+        tache = Tache.objects.create(projet=projet,**validated_data)
+
+        return tache
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.intitule = validated_data.get('intitule', instance.intitule)
+        instance.projet= validated_data.get('projet', instance.projet)
+        instance.save()
+        return instance
+
+
+class SousTacheSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=SousTache
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        tache = validated_data.pop('tache')
+        if SousTache.objects.filter(nom_tache=validated_data["nom_tache"],tache=tache).exists() :
+            raise serializers.ValidationError('Cette sous tache existe déja')
+            return validated_data
+        sous_tache = SousTache.objects.create(tache=tache,**validated_data)
+
+        return sous_tache
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.nom_tache = validated_data.get('nom_tache', instance.nom_tache)
+        instance.echeance= validated_data.get('echeance', instance.echeance)
+        instance.date_debut = validated_data.get('date_debut', instance.date_debut)
+        instance.date_fin= validated_data.get('date_fin', instance.date_fin)
+        instance.descriptif = validated_data.get('descriptif', instance.descriptif)
+        instance.commentaire= validated_data.get('commentaire', instance.commentaire)
+        instance.etat = validated_data.get('etat', instance.etat)
+        instance.tache= validated_data.get('tache', instance.tache)
+        instance.save()
+        return instance

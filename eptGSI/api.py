@@ -169,3 +169,49 @@ class PlanningViewSet(ModelViewSet):
         if planning_id is not None:
             queryset = queryset.filter(id=planning_id)
         return queryset
+
+    
+class ProjetViewSet(ModelViewSet):
+    serializer_class= ProjetSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Projet.objects.all()
+    
+        projet_id = self.request.GET.get('id_projet')
+        if projet_id is not None:
+            queryset = queryset.filter(id=projet_id)
+        return queryset
+
+
+class TacheViewSet(ModelViewSet):
+    serializer_class= TacheSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Tache.objects.all()
+    
+        tache_id = self.request.GET.get('id_tache')
+        if tache_id is not None:
+            queryset = queryset.filter(id=tache_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        tache=self.get_object()
+        SousTache.objects.filter(id=tache.id).delete()
+        tache.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SousTacheViewSet(ModelViewSet):
+    serializer_class= SousTacheSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= SousTache.objects.all()
+    
+        sous_tache_id = self.request.GET.get('id_sous_tache')
+        if sous_tache_id is not None:
+            queryset = queryset.filter(id=sous_tache_id)
+        return queryset

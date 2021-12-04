@@ -16,9 +16,8 @@ router.register(r'programme', ProgrammeViewSet, basename='Programme')
 router.register(r'stage', StageViewSet, basename='Stage')
 router.register(r'maitre_stage', MaitreStageViewSet, basename='MaitreStage')
 router.register(r'planning', PlanningViewSet, basename='Planning')
-
-
-
+router.register(r'tache', TacheViewSet, basename='Tache')
+router.register(r'sous_tache', SousTacheViewSet, basename='SousTache')
 
 
 
