@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Etudiant, Membre, Compte, Entreprise, Programme
+from .models import *
 
 
 class CompteSerializer(serializers.ModelSerializer):
@@ -25,11 +25,10 @@ class MembreSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        membre = validated_data.pop('membre')
-        compte= membre.pop('compte')
-        email=membre["email"]
-        telephone=membre["telephone"]
-        identifiant=compte["identifiant"]
+        compte = validated_data.pop('compte')
+        email=validated_data.get('email')
+        telephone=validated_data.get('telephone')
+        identifiant=validated_data.get('identifiant')
         if Membre.objects.filter(email=email).exists() :
             raise serializers.ValidationError('Ce membre existe déja')
             return email
@@ -40,7 +39,7 @@ class MembreSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Ce compte existe déja')
             return identifiant
         compte=Compte.objects.create(**compte)
-        membre=Membre.objects.create(compte=compte,**membre)
+        membre=Membre.objects.create(compte=compte,**validated_data)
 
         return membre
 
@@ -117,3 +116,121 @@ class ProgrammeSerializer(serializers.ModelSerializer):
     class Meta:
         model=Programme
         fields="__all__"
+
+#immersion (Fary)
+
+class StageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Stage
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        etudiant = validated_data.pop('etudiant')
+        immersion= validated_data.pop('immersion')
+        if Stage.objects.filter(etudiant=etudiant, annee=validated_data["annee"]).exists() :
+            raise serializers.ValidationError('Ce stage existe déja')
+            return email
+        stage = Stage.objects.create(etudiant=etudiant,immersion=immersion,**validated_data)
+
+        return stage
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.annee = validated_data.get('annee', instance.annee)
+        instance.date_debut= validated_data.get('date_debut', instance.date_debut)
+        instance.date_fin= validated_data.get('date_fin', instance.date_fin)
+        instance.etudiant= validated_data.get('etudiant', instance.etudiant)
+        instance.immersion= validated_data.get('immersion', instance.immersion)
+
+
+        if instance.rapport_stage:
+            instance.rapport_stage.delete()
+        instance.rapport_stage = validated_data.get('rapport_stage', instance.rapport_stage)
+
+
+        instance.save()
+        return instance
+
+
+class MaitreStageSerializer(serializers.ModelSerializer):
+    membre = MembreSerializer()
+
+    class Meta:
+        model=MaitreStage
+        fields=["membre"]
+
+
+    def create(self, validated_data):
+        compte = validated_data.pop('compte')
+        email=validated_data.get("email")
+        telephone=validated_data.get("telephone")
+        identifiant=validated_data.get("identifiant")
+        if Membre.objects.filter(email=email).exists() :
+            raise serializers.ValidationError('Ce membre existe déja')
+            return email
+        if Membre.objects.filter(telephone=telephone).exists():
+            raise serializers.ValidationError('Ce membre existe déja')
+            return telephone
+        if Compte.objects.filter(identifiant=identifiant).exists():
+            raise serializers.ValidationError('Ce compte existe déja')
+            return identifiant
+        compte=Compte.objects.create(**compte)
+        membre=Membre.objects.create(compte=compte,**membre)
+        maitre_stage= MaitreStage.objects.create(membre=membre,**validated_data)
+
+
+        return maitre_stage
+
+
+    def update(self, instance, validated_data):
+        compte_data = validated_data.pop('compte')
+        compte = instance.compte         
+        instance.nom = validated_data.get('nom', instance.nom)
+        instance.prenom = validated_data.get('prenom', instance.prenom)
+        instance.email = validated_data.get('email', instance.email)
+        instance.telephone = validated_data.get('telephone', instance.telephone)
+        instance.save()
+        
+        compte.identifiant = compte_data.get('identifiant', compte.identifiant)
+        compte.mot_de_passe = compte_data.get('mot_de_passe', compte.mot_de_passe)
+        compte.save()
+        
+        return instance
+
+
+##here
+class PlanningSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Planning
+        fields=["annee","etudiant","maitreStage"]
+
+
+    def create(self, validated_data):
+        etudiant = validated_data.pop('etudiant')
+        immersion= validated_data.pop('immersion')
+        if Stage.objects.filter(etudiant=etudiant, annee=validated_data["annee"]).exists() :
+            raise serializers.ValidationError('Ce stage existe déja')
+            return email
+        stage = Stage.objects.create(etudiant=etudiant,immersion=immersion,**validated_data)
+
+        return stage
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.annee = validated_data.get('annee', instance.annee)
+        instance.date_debut= validated_data.get('date_debut', instance.date_debut)
+        instance.date_fin= validated_data.get('date_fin', instance.date_fin)
+        instance.etudiant= validated_data.get('etudiant', instance.etudiant)
+        instance.immersion= validated_data.get('immersion', instance.immersion)
+
+
+        if instance.rapport_stage:
+            instance.rapport_stage.delete()
+        instance.rapport_stage = validated_data.get('rapport_stage', instance.rapport_stage)
+
+
+        instance.save()
+        return instance
+
+

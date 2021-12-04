@@ -60,10 +60,11 @@ class Immersion(models.Model):
 
 
 class Stage(models.Model):
-    annee = models.CharField(max_length=100)
+    annee = models.DateField(max_length=100)
     date_debut = models.DateField()
     date_fin = models.DateField()
-    rapport_stage = models.FileField(upload_to='rapports', storage=rapport_grid_fs_storage)
+    rapport_stage = models.FileField(upload_to='rapports', storage=rapport_grid_fs_storage,blank= True,
+        null=True)
     etudiant = models.ForeignKey(Etudiant, related_name="Stage",blank= True,
         null=True, on_delete=models.CASCADE)
     immersion = models.ForeignKey(Immersion, related_name="Stage",blank= True,

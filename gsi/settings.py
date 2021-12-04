@@ -51,8 +51,11 @@ INSTALLED_APPS = [
 
 ]
 
+DATE_INPUT_FORMATS = ['%d/%m/%Y']
 
 REST_FRAMEWORK = {
+    "DATE_INPUT_FORMATS": [("%Y-%m-%d")],
+
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'
     ],
 

@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from .serializers import EtudiantSerializer, MembreSerializer, CompteSerializer, EntrepriseSerializer,ProgrammeSerializer
+from .serializers import *
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Etudiant, Membre, Compte
@@ -99,4 +99,38 @@ class ProgrammeViewSet(ModelViewSet):
         programme_id = self.request.GET.get('id_programme')
         if programme_id is not None:
             queryset = queryset.filter(id=programme_id)
+        return queryset
+
+
+class StageViewSet(ModelViewSet):
+    serializer_class= StageSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Stage.objects.all()
+    
+        stage_id = self.request.GET.get('id_stage')
+        if stage_id is not None:
+            queryset = queryset.filter(id=stage_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        stage=self.get_object()
+        stage.rapport_stage.delete()
+        stage.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class MaitreStageViewSet(ModelViewSet):
+    serializer_class= MaitreStageSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= MaitreStage.objects.all()
+    
+        maitre_stage_id = self.request.GET.get('id_maitre_stage')
+        if maitre_stage_id is not None:
+            queryset = queryset.filter(id=maitre_stage_id)
         return queryset
