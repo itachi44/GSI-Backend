@@ -6,6 +6,7 @@ from django.conf import settings
 
 cv_grid_fs_storage = GridFSStorage(collection='cvs', base_url=''.join([settings.BASE_URL, 'cvs/']))
 rapport_grid_fs_storage = GridFSStorage(collection='rapports', base_url=''.join([settings.BASE_URL, 'rapports/']))
+pj_grid_fs_storage = GridFSStorage(collection='pjs', base_url=''.join([settings.BASE_URL, 'pjs/']))
 
 # Create your models here.
 
@@ -113,6 +114,12 @@ class Evenement(models.Model):
     intitule = models.CharField(max_length=100)
     date = models.DateField()
     destinataires = models.ManyToManyField(Destinataire)
+
+
+class PieceJointe(models.Model):
+    fichier = models.FileField(upload_to='pjs', storage=pj_grid_fs_storage)
+    evenement = models.ForeignKey(Evenement, related_name="PieceJointe", on_delete = models.CASCADE)
+
 
 
 class MembreDept(models.Model):

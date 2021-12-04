@@ -188,11 +188,11 @@ class MaitreStageSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        print(validated_data)
         membre = validated_data.pop('membre')
-        email=validated_data.get("email")
-        telephone=validated_data.get("telephone")
-        identifiant=validated_data.get("identifiant")
+        compte= membre.pop('compte')
+        email=membre["email"]
+        telephone=membre["telephone"]
+        identifiant=compte["identifiant"]
         if Membre.objects.filter(email=email).exists() :
             raise serializers.ValidationError('Ce membre existe déja')
             return email
@@ -204,26 +204,24 @@ class MaitreStageSerializer(serializers.ModelSerializer):
             return identifiant
         compte=Compte.objects.create(**compte)
         membre=Membre.objects.create(compte=compte,**membre)
-        maitre_stage= MaitreStage.objects.create(membre=membre,**validated_data)
+        maitreStage= MaitreStage.objects.create(membre=membre,**validated_data)
 
+        return maitreStage
 
-        return maitre_stage
-
-
-    def update(self, instance, validated_data):
-        compte_data = validated_data.pop('compte')
-        compte = instance.compte         
-        instance.nom = validated_data.get('nom', instance.nom)
-        instance.prenom = validated_data.get('prenom', instance.prenom)
-        instance.email = validated_data.get('email', instance.email)
-        instance.telephone = validated_data.get('telephone', instance.telephone)
+    def update(self, instance, validated_data,*args, **kwargs):        
+        membre_data = validated_data.pop('membre')
+        membre_serializer = MembreSerializer(data = membre_data,partial=True)
+             
+        if membre_serializer.is_valid():
+            membre = membre_serializer.update(instance=instance.membre, validated_data=membre_serializer.validated_data)
+        
+           
         instance.save()
         
-        compte.identifiant = compte_data.get('identifiant', compte.identifiant)
-        compte.mot_de_passe = compte_data.get('mot_de_passe', compte.mot_de_passe)
-        compte.save()
-        
         return instance
+
+
+
 
 
 class PlanningSerializer(serializers.ModelSerializer):
@@ -328,5 +326,227 @@ class SousTacheSerializer(serializers.ModelSerializer):
         instance.commentaire= validated_data.get('commentaire', instance.commentaire)
         instance.etat = validated_data.get('etat', instance.etat)
         instance.tache= validated_data.get('tache', instance.tache)
+        instance.save()
+        return instance
+
+
+class MembreDeptSerializer(serializers.ModelSerializer):
+    membre = MembreSerializer()
+
+    class Meta:
+        model=MembreDept
+        fields=["membre"]
+
+
+    def create(self, validated_data):
+        membre = validated_data.pop('membre')
+        compte= membre.pop('compte')
+        email=membre["email"]
+        telephone=membre["telephone"]
+        identifiant=compte["identifiant"]
+        if Membre.objects.filter(email=email).exists() :
+            raise serializers.ValidationError('Ce membre existe déja')
+            return email
+        if Membre.objects.filter(telephone=telephone).exists():
+            raise serializers.ValidationError('Ce membre existe déja')
+            return telephone
+        if Compte.objects.filter(identifiant=identifiant).exists():
+            raise serializers.ValidationError('Ce compte existe déja')
+            return identifiant
+        compte=Compte.objects.create(**compte)
+        membre=Membre.objects.create(compte=compte,**membre)
+        membreDept= MembreDept.objects.create(membre=membre,**validated_data)
+
+        return membreDept
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        membre_data = validated_data.pop('membre')
+        membre_serializer = MembreSerializer(data = membre_data,partial=True)
+             
+        if membre_serializer.is_valid():
+            membre = membre_serializer.update(instance=instance.membre, validated_data=membre_serializer.validated_data)
+        
+        instance.save()
+        
+        return instance
+    
+    
+class DestinataireSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Destinataire
+        fields="__all__"
+
+
+class RespEntrepriseSerializer(serializers.ModelSerializer):
+    membre = MembreSerializer()
+
+    class Meta:
+        model=RespEntreprise
+        fields=["membre"]
+
+
+    def create(self, validated_data):
+        membre = validated_data.pop('membre')
+        compte= membre.pop('compte')
+        email=membre["email"]
+        telephone=membre["telephone"]
+        identifiant=compte["identifiant"]
+        if Membre.objects.filter(email=email).exists() :
+            raise serializers.ValidationError('Ce membre existe déja')
+            return email
+        if Membre.objects.filter(telephone=telephone).exists():
+            raise serializers.ValidationError('Ce membre existe déja')
+            return telephone
+        if Compte.objects.filter(identifiant=identifiant).exists():
+            raise serializers.ValidationError('Ce compte existe déja')
+            return identifiant
+        compte=Compte.objects.create(**compte)
+        membre=Membre.objects.create(compte=compte,**membre)
+        respEntreprise= RespEntreprise.objects.create(membre=membre,**validated_data)
+
+        return respEntreprise
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        membre_data = validated_data.pop('membre')
+        membre_serializer = MembreSerializer(data = membre_data,partial=True)   
+             
+        if membre_serializer.is_valid():
+            membre = membre_serializer.update(instance=instance.membre, validated_data=membre_serializer.validated_data)
+        
+        instance.save()
+        
+        return instance
+    
+    
+class ChefDeptSerializer(serializers.ModelSerializer):
+    membre = MembreSerializer()
+
+    class Meta:
+        model=ChefDept
+        fields=["membre"]
+
+
+    def create(self, validated_data):
+        membre = validated_data.pop('membre')
+        compte= membre.pop('compte')
+        email=membre["email"]
+        telephone=membre["telephone"]
+        identifiant=compte["identifiant"]
+        if Membre.objects.filter(email=email).exists() :
+            raise serializers.ValidationError('Ce membre existe déja')
+            return email
+        if Membre.objects.filter(telephone=telephone).exists():
+            raise serializers.ValidationError('Ce membre existe déja')
+            return telephone
+        if Compte.objects.filter(identifiant=identifiant).exists():
+            raise serializers.ValidationError('Ce compte existe déja')
+            return identifiant
+        compte=Compte.objects.create(**compte)
+        membre=Membre.objects.create(compte=compte,**membre)
+        chefDept= ChefDept.objects.create(membre=membre,**validated_data)
+
+        return chefDept
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        membre_data = validated_data.pop('membre')
+        membre_serializer = MembreSerializer(data = membre_data,partial=True)   
+             
+        if membre_serializer.is_valid():
+            membre = membre_serializer.update(instance=instance.membre, validated_data=membre_serializer.validated_data)
+        
+        instance.save()
+        
+        return instance
+    
+    
+class MessageSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Message
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        etudiant = validated_data.pop('etudiant')
+        stage = Stage.objects.create(etudiant=etudiant,**validated_data)
+
+        return stage
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.intitule = validated_data.get('intitule', instance.intitule)
+        instance.contenu= validated_data.get('contenu', instance.contenu)
+        instance.etudiant= validated_data.get('etudiant', instance.etudiant)
+
+        instance.save()
+        return instance
+    
+    
+class EvaluationSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Evaluation
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        etudiant = validated_data.pop('etudiant')
+        maitre_de_stage = validated_data.pop('maitre_de_stage')
+        stage = Stage.objects.create(etudiant=etudiant, maitre_de_stage=maitre_de_stage, **validated_data)
+
+        return stage
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.note_evaluation = validated_data.get('note_evaluation', instance.note_evaluation)
+        instance.appreciation= validated_data.get('appreciation', instance.appreciation)
+        instance.etudiant= validated_data.get('etudiant', instance.etudiant)
+        instance.maitre_de_stage= validated_data.get('maitre_de_stage', instance.maitre_de_stage)
+
+        instance.save()
+        return instance
+    
+    
+class EvenementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Evenement
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        destinataires = validated_data.pop("destinataires")
+        evenement = Evenement.objects.create(**validated_data)
+        for destinataire in destinataires:
+            evenement.destinataires.add(destinataire)
+        evenement.save()
+
+        return evenement
+
+    def update(self, instance, validated_data,*args, **kwargs):        
+        instance.details = validated_data.get('details', instance.details)
+        instance.intitule= validated_data.get('intitule', instance.intitule)
+        instance.date= validated_data.get('date', instance.date)
+
+        instance.save()
+        return instance
+    
+    
+class PieceJointeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=PieceJointe
+        fields="__all__"
+
+
+    def create(self, validated_data):
+        evenement = validated_data.pop('evenement')
+        pieceJointe = PieceJointe.objects.create(evenement=evenement, **validated_data)
+        
+        return pieceJointe
+
+    def update(self, instance, validated_data,*args, **kwargs): 
+        instance.evenement = validated_data.get('evenement', instance.evenement)       
+        if instance.fichier:
+            instance.fichier.delete()
+        instance.fichier = validated_data.get('fichier', instance.fichier)
+
         instance.save()
         return instance

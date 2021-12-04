@@ -18,8 +18,16 @@ router.register(r'maitre_stage', MaitreStageViewSet, basename='MaitreStage')
 router.register(r'planning', PlanningViewSet, basename='Planning')
 router.register(r'tache', TacheViewSet, basename='Tache')
 router.register(r'sous_tache', SousTacheViewSet, basename='SousTache')
-
-
+router.register(r'destinataire', DestinataireViewSet, basename='Destinataire')
+router.register(r'membreDept', MembreDeptViewSet, basename='MembreDept')
+router.register(r'entreprise', EntrepriseViewSet, basename='Entreprise')
+router.register(r'programme', ProgrammeViewSet, basename='Programme')
+router.register(r'stage', StageViewSet, basename='Stage')
+router.register(r'respEntreprise', RespEntrepriseViewSet, basename='RespEntreprise')
+router.register(r'chefDept', ChefDeptViewSet, basename='ChefDept')
+router.register(r'message', MessageViewSet, basename='Message')
+router.register(r'evenement', EvenementViewSet, basename='Evenement')
+router.register(r'pieceJointe', PieceJointeViewSet, basename='PieceJointe')
 
 urlpatterns = [
 
