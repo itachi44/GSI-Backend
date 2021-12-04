@@ -42,7 +42,8 @@ class Etudiant(models.Model):
 class Entreprise(models.Model):
     nom_entreprise = models.CharField(max_length=100)
     localisation = models.CharField(max_length=100)
-    domaine_expertise = models.CharField(max_length=100)
+    domaine_expertise = models.CharField(max_length=100,blank=True,
+        null=True)
 
   
 class Programme(models.Model):
@@ -53,10 +54,8 @@ class Immersion(models.Model):
     description = models.TextField()
     date_debut = models.DateField()
     date_fin = models.DateField()
-    entreprise= models.ForeignKey(Entreprise, related_name="Immersion",blank=True,
-        null=True, on_delete=models.CASCADE)
-    programme = models.ForeignKey(Programme, related_name="Immersion",blank=True,
-        null = True, on_delete=models.CASCADE)
+    entreprise= models.ForeignKey(Entreprise, related_name="Immersion", on_delete=models.CASCADE)
+    programme = models.ForeignKey(Programme, related_name="Immersion", on_delete=models.CASCADE)
 
 
 class Stage(models.Model):
@@ -65,51 +64,44 @@ class Stage(models.Model):
     date_fin = models.DateField()
     rapport_stage = models.FileField(upload_to='rapports', storage=rapport_grid_fs_storage,blank= True,
         null=True)
-    etudiant = models.ForeignKey(Etudiant, related_name="Stage",blank= True,
-        null=True, on_delete=models.CASCADE)
-    immersion = models.ForeignKey(Immersion, related_name="Stage",blank= True,
-        null=True, on_delete=models.CASCADE)
+    etudiant = models.ForeignKey(Etudiant, related_name="Stage", on_delete=models.CASCADE)
+    immersion = models.ForeignKey(Immersion, related_name="Stage", on_delete=models.CASCADE)
 
 
 class MaitreStage(models.Model):
-    membre = models.ForeignKey(Membre, related_name = "MaitreStage",blank=True,
-        null=True, on_delete=models.CASCADE)
+    membre = models.ForeignKey(Membre, related_name = "MaitreStage", on_delete=models.CASCADE)
 
 
 class Planning(models.Model):
     annee = models.DateField()
-    etudiant = models.ForeignKey(Etudiant, related_name="Planning",blank=True,
-        null= True, on_delete=models.CASCADE)
-    maitreStage = models.ForeignKey(MaitreStage, related_name="Planning",blank=True,
-        null= True, on_delete=models.CASCADE)
+    etudiant = models.ForeignKey(Etudiant, related_name="Planning", on_delete=models.CASCADE)
+    maitreStage = models.ForeignKey(MaitreStage, related_name="Planning", on_delete=models.CASCADE)
     
     
 class Projet(models.Model):
     nom_projet = models.CharField(max_length=100)
-    descriptif_projet = models.TextField()
-    etat = models.CharField(max_length=100)
-    programme = models.ForeignKey(Programme, related_name = "Projet",blank=True,
-        null=True, on_delete=models.PROTECT)
-    planning = models.ForeignKey(Planning, related_name = "Projet",blank=True,
-        null=True, on_delete=models.PROTECT)
+    descriptif_projet = models.TextField(blank=True,
+        null=True)
+    etat = models.CharField(max_length=100,blank=True,
+        null=True)
+    programme = models.ForeignKey(Programme, related_name = "Projet", on_delete=models.PROTECT)
+    planning = models.ForeignKey(Planning, related_name = "Projet", on_delete=models.PROTECT)
 
 
 class Tache(models.Model):
     intitule = models.CharField(max_length=100)
-    projet = models.ForeignKey(Projet, related_name = "Tache",blank=True,
-        null=True,on_delete=models.PROTECT)
+    projet = models.ForeignKey(Projet, related_name = "Tache",on_delete=models.PROTECT)
 
 
 class SousTache(models.Model):
     nom_tache = models.CharField(max_length=100)
-    echeance = models.DateField()
-    date_debut = models.DateField()
-    date_fin = models.DateField()
-    descriptif = models.TextField()
-    commentaire = models.TextField()
+    echeance = models.DateField(blank=True,null=True)
+    date_debut = models.DateField(blank=True,null=True)
+    date_fin = models.DateField(blank=True,null=True)
+    descriptif = models.TextField(blank=True,null=True)
+    commentaire = models.TextField(blank=True,null=True)
     etat = models.BooleanField(default = False)
-    tache = models.ForeignKey(Tache, related_name = "SousTache",blank=True,
-        null=True, on_delete=models.PROTECT)
+    tache = models.ForeignKey(Tache, related_name = "SousTache",blank=True,null=True, on_delete=models.PROTECT)
 
 
 class Destinataire(models.Model):
@@ -124,31 +116,25 @@ class Evenement(models.Model):
 
 
 class MembreDept(models.Model):
-    membre = models.ForeignKey(Membre, related_name = "MembreDept",blank=True,
-        null=True, on_delete=models.CASCADE)
+    membre = models.ForeignKey(Membre, related_name = "MembreDept", on_delete=models.CASCADE)
 
 
 class RespEntreprise(models.Model): 
-    membre = models.ForeignKey(Membre, related_name = "RespEntreprise",blank=True,
-        null=True, on_delete=models.CASCADE)
+    membre = models.ForeignKey(Membre, related_name = "RespEntreprise",on_delete=models.CASCADE)
 
 
 class ChefDept(models.Model):
-    membre = models.ForeignKey(Membre, related_name = "ChefDept",blank=True,
-        null=True, on_delete=models.CASCADE)
+    membre = models.ForeignKey(Membre, related_name = "ChefDept", on_delete=models.CASCADE)
 
 
 class Message(models.Model):
     intitule = models.CharField(max_length=100)
     contenu = models.TextField()
-    etudiant = models.ForeignKey(Etudiant, related_name = "Message",blank=True,
-        null=True, on_delete=models.PROTECT)
+    etudiant = models.ForeignKey(Etudiant, related_name = "Message", on_delete=models.PROTECT)
 
 
 class Evaluation(models.Model):
     note_evaluation = models.FloatField()
     appreciation = models.TextField()
-    etudiant = models.ForeignKey(Etudiant, related_name = "Evaluation",blank=True,
-        null=True, on_delete=models.PROTECT)
-    maitre_de_stage = models.ForeignKey(MaitreStage, related_name = "Evaluation",blank=True,
-        null=True, on_delete = models.PROTECT)
+    etudiant = models.ForeignKey(Etudiant, related_name = "Evaluation", on_delete=models.PROTECT)
+    maitre_de_stage = models.ForeignKey(MaitreStage, related_name = "Evaluation", on_delete = models.PROTECT)
