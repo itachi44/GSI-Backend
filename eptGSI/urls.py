@@ -4,7 +4,6 @@ from django.urls import path, include
 from . import views
 from .api import *
 
-
 #API ROUTER FOR ENDPOINTS
 router = SimpleRouter()
 router.register(r'etudiant', EtudiantViewSet, basename='Etudiant')
@@ -29,8 +28,13 @@ router.register(r'message', MessageViewSet, basename='Message')
 router.register(r'evenement', EvenementViewSet, basename='Evenement')
 router.register(r'pieceJointe', PieceJointeViewSet, basename='PieceJointe')
 
+#URIs pour obtenir et rafraichir un token
+# router.register(r'token', GetTokenViewSet, basename='Obtain_token')
+# router.register(r'refresh_token', RefreshTokenViewSet, basename='Refresh_token')
+
+
 urlpatterns = [
 
     url(r'api/', include(router.urls)),
-    url(r'^$', views.index, name='index')
+    url(r'^$', views.index, name='index'),
 ]

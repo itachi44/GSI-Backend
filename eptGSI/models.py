@@ -1,6 +1,9 @@
 from django.db import models
 from djongo.storage import GridFSStorage
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import RegexValidator
+
 
 
 
@@ -18,10 +21,12 @@ class Compte(models.Model):
 
 
 class Membre(models.Model):
+    phone_regex=RegexValidator(regex=r'^(\+221)?[- ]?(77|70|76|78)[- ]?([0-9]{3})[- ]?([0-9]{2}[- ]?){2}$', message="le numero de telephone est invalide!") #phone number validator
+
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
-    telephone = models.CharField(max_length=20)
+    telephone = models.CharField(validators=[phone_regex],max_length=20)
     compte = models.ForeignKey(Compte,related_name="Membre",blank=True,
         null=True, on_delete=models.CASCADE)
     
@@ -38,6 +43,11 @@ class Etudiant(models.Model):
 
     def __str__(self):
         return str(self.membre.prenom + ' '+ self.membre.nom )
+
+    # class meta:
+    #     permissions=[
+    #         ("is_student","is student")
+    #     ]
 
 
 class Entreprise(models.Model):

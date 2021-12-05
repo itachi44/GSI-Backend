@@ -31,6 +31,7 @@ class EtudiantViewSet(ModelViewSet):
         etudiant=self.get_object()
         Membre.objects.filter(email=etudiant.membre.email).delete()
         Compte.objects.filter(identifiant=etudiant.membre.compte.identifiant).delete()
+        User.objects.filter(email=etudiant.membre.email).delete()
         etudiant.cv.delete()
         etudiant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

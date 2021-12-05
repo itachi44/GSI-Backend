@@ -48,8 +48,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'django_filters'
+    ]
 
-]
 
 DATE_INPUT_FORMATS = ['%d/%m/%Y']
 

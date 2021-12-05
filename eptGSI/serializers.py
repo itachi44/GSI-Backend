@@ -1,5 +1,8 @@
 from rest_framework import serializers 
 from .models import *
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
+
 
 
 class CompteSerializer(serializers.ModelSerializer):
@@ -74,6 +77,7 @@ class EtudiantSerializer(serializers.ModelSerializer):
         email=membre["email"]
         telephone=membre["telephone"]
         identifiant=compte["identifiant"]
+        mot_de_passe=compte["mot_de_passe"]
         if Membre.objects.filter(email=email).exists() :
             raise serializers.ValidationError('Ce membre existe déja')
             return email
@@ -86,6 +90,13 @@ class EtudiantSerializer(serializers.ModelSerializer):
         compte=Compte.objects.create(**compte)
         membre=Membre.objects.create(compte=compte,**membre)
         etudiant= Etudiant.objects.create(membre=membre,**validated_data)
+        user=User.objects.get_or_create(username=email, email=identifiant,password=mot_de_passe)
+        content_type = ContentType.objects.get_for_model(Etudiant)
+        permission = Permission.objects.get_or_create(codename='is_student', name='is student', content_type=content_type)
+        user.user_permissions.add(permission)
+        print(user.has_perm("is_student"))
+
+
 
         return etudiant
 
