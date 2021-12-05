@@ -90,15 +90,16 @@ class EtudiantSerializer(serializers.ModelSerializer):
         compte=Compte.objects.create(**compte)
         membre=Membre.objects.create(compte=compte,**membre)
         etudiant= Etudiant.objects.create(membre=membre,**validated_data)
-        user=User.objects.get_or_create(username=email, email=identifiant,password=mot_de_passe)
+        user=User.objects.create_user(username=email, email=identifiant,password=mot_de_passe)
         content_type = ContentType.objects.get_for_model(Etudiant)
-        permission = Permission.objects.get_or_create(codename='is_student', name='is student', content_type=content_type)
-        user.user_permissions.add(permission)
-        print(user.has_perm("is_student"))
-
-
-
+        permission = Permission.objects.filter(codename='is_student').first()
+        if permission:
+            user.user_permissions.add(permission)
+        else:
+            created = Permission.objects.create(codename='is_student', name='is student', content_type=content_type)
+            user.user_permissions.add(created)
         return etudiant
+
 
     def update(self, instance, validated_data,*args, **kwargs):        
         membre_data = validated_data.pop('membre')
@@ -561,3 +562,12 @@ class PieceJointeSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+
+#User serializer pour la classe User de django
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields="__all__"

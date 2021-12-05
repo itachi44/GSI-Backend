@@ -10,16 +10,22 @@ from django.db import transaction
 from rest_framework.decorators import action
 from django.http import Http404
 from rest_framework import status
+from .permissions import IsStudentAuthenticated
+from django.contrib.auth import authenticate
+from .authentication import *
+
+
 
 #Vues API
 
 class EtudiantViewSet(ModelViewSet):
     serializer_class= EtudiantSerializer
-    #permission_classes=(IsAuthenticated,)
+    permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
     def get_queryset(self):
         queryset= Etudiant.objects.all()
+
     
         etudiant_id = self.request.GET.get('id_etudiant')
         if etudiant_id is not None:
@@ -404,3 +410,38 @@ class PieceJointeViewSet(ModelViewSet):
         pieceJointe.fichier.delete()
         pieceJointe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+#get Token view
+
+
+class GetTokenViewSet(ModelViewSet):
+    serializer_class= CompteSerializer
+    http_method_names = ["post","head"]
+
+    def create(self, request, *args, **kwargs):
+
+        compte_serializer=CompteSerializer(data=request.data)
+        if not compte_serializer.is_valid():
+            return Response(compte_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+        user= authenticate(
+            username = compte_serializer.data['identifiant'],
+            password = compte_serializer.data['mot_de_passe'] 
+        )
+        if not user:
+            return Response({'detail': 'Invalid Credentials or activate account..'}, status=status.HTTP_404_NOT_FOUND)
+            
+        #TOKEN STUFF
+        token, _ = Token.objects.get_or_create(user = user)
+        #token_expire_handler will check, if the token is expired it will generate new one
+        is_expired, token = token_expire_handler(token)    
+        user_serialized = UserSerializer(user)
+
+
+        return Response({
+        'user': user_serialized.data, 
+        'expires_in': expires_in(token),
+        'token': token.key
+            }, status=status.HTTP_200_OK)
+

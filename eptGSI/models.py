@@ -155,3 +155,6 @@ class Evaluation(models.Model):
     appreciation = models.TextField()
     etudiant = models.ForeignKey(Etudiant, related_name = "Evaluation", on_delete=models.PROTECT)
     maitre_de_stage = models.ForeignKey(MaitreStage, related_name = "Evaluation", on_delete = models.PROTECT)
+
+
+

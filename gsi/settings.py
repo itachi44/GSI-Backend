@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_filters'
     ]
 
+TOKEN_EXPIRED_AFTER_SECONDS = 84600*30 #30
 
 DATE_INPUT_FORMATS = ['%d/%m/%Y']
 
