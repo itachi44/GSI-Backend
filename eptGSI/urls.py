@@ -29,7 +29,7 @@ router.register(r'evenement', EvenementViewSet, basename='Evenement')
 router.register(r'pieceJointe', PieceJointeViewSet, basename='PieceJointe')
 
 #URIs pour obtenir et rafraichir un token
-router.register(r'getToken', GetTokenViewSet, basename='Obtain_token')
+router.register(r'login', GetTokenViewSet, basename='Obtain_token')
 # router.register(r'refresh_token', RefreshTokenViewSet, basename='Refresh_token')
 
 
