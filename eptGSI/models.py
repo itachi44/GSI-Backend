@@ -29,6 +29,8 @@ class Membre(models.Model):
     
     def __str__(self):
         return str(self.prenom + ' '+ self.nom )
+    
+    __repr__=__str__
 
 
 class Etudiant(models.Model):
@@ -41,6 +43,7 @@ class Etudiant(models.Model):
     def __str__(self):
         return str(self.membre.prenom + ' '+ self.membre.nom )
 
+    __repr__=__str__
 
 class Entreprise(models.Model):
     nom_entreprise = models.CharField(max_length=100)
@@ -51,13 +54,17 @@ class Entreprise(models.Model):
     def __str__(self):
         return str(self.nom_entreprise)
 
-  
+    __repr__=__str__
+
+
 class Programme(models.Model):
     
     def __str__(self):
         return str('Programme '+ str(self.id))
 
-      
+    __repr__=__str__
+
+
 class Immersion(models.Model):
     description = models.TextField()
     date_debut = models.DateField()
@@ -67,7 +74,9 @@ class Immersion(models.Model):
 
     def __str__(self):
         return str('Immersion '+ self.entreprise.nom_entreprise+' '+ str(self.id))
-
+    
+    __repr__=__str__
+ 
 class Stage(models.Model):
     annee = models.DateField(max_length=100)
     date_debut = models.DateField()
@@ -80,12 +89,16 @@ class Stage(models.Model):
     def __str__(self):
         return str('Stage '+ self.etudiant.membre.prenom+' '+ self.etudiant.membre.nom+' '+ self.annee )
 
+    __repr__=__str__
 
 class MaitreStage(models.Model):
     membre = models.ForeignKey(Membre, related_name = "MaitreStage", on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.membre.prenom+' '+ self.membre.nom)
+
+    __repr__=__str__
+
 
 class Projet(models.Model):
     nom_projet = models.CharField(max_length=100)
@@ -98,6 +111,8 @@ class Projet(models.Model):
     def __str__(self):
         return str(self.nom_projet)
 
+    __repr__=__str__
+
 
 class Planning(models.Model):
     annee = models.DateField()
@@ -108,6 +123,7 @@ class Planning(models.Model):
     def __str__(self):
         return str('Planning '+ self.etudiant.membre.prenom+' '+ self.etudiant.membre.nom+ ' '+ self.annee )
     
+    __repr__=__str__
 
 class Tache(models.Model):
     intitule = models.CharField(max_length=100)
@@ -116,6 +132,9 @@ class Tache(models.Model):
     def __str__(self):
         return str(self.intitule)
     
+    __repr__=__str__
+
+
 class SousTache(models.Model):
     nom_tache = models.CharField(max_length=100)
     echeance = models.DateField(blank=True,null=True)
@@ -129,12 +148,17 @@ class SousTache(models.Model):
     def __str__(self):
         return str(self.nom_tache)
 
+    __repr__=__str__
+
 
 class Destinataire(models.Model):
     label=models.CharField(max_length=100)
 
     def __str__(self):
         return str(self.label)
+
+    __repr__=__str__
+
 
 class Evenement(models.Model):
     details = models.TextField()
@@ -145,6 +169,8 @@ class Evenement(models.Model):
     def __str__(self):
         return str(self.intitule)
 
+    __repr__=__str__
+
 
 class PieceJointe(models.Model):
     fichier = models.FileField(upload_to='pjs', storage=pj_grid_fs_storage)
@@ -153,12 +179,15 @@ class PieceJointe(models.Model):
     def __str__(self):
         return str('Piece Jointe '+ self.evenement.intitule)
 
+    __repr__=__str__
+
 class MembreDept(models.Model):
     membre = models.ForeignKey(Membre, related_name = "MembreDept", on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.membre.prenom + ' '+ self.membre.nom)
 
+    __repr__=__str__
 
 class RespEntreprise(models.Model): 
     membre = models.ForeignKey(Membre, related_name = "RespEntreprise",on_delete=models.CASCADE)
@@ -166,12 +195,16 @@ class RespEntreprise(models.Model):
     def __str__(self):
         return str(self.membre.prenom + ' '+ self.membre.nom)
 
+    __repr__=__str__
+
 
 class ChefDept(models.Model):
     membre = models.ForeignKey(Membre, related_name = "ChefDept", on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.membre.prenom + ' '+ self.membre.nom)
+
+    __repr__=__str__
 
 
 class Message(models.Model):
@@ -183,6 +216,8 @@ class Message(models.Model):
     def __str__(self):
         return str(self.intitule)
 
+    __repr__=__str__
+
 
 class Evaluation(models.Model):
     note_evaluation = models.FloatField()
@@ -193,4 +228,5 @@ class Evaluation(models.Model):
     def __str__(self):
         return str('Evaluation '+ self.etudiant.membre.prenom + ' '+ self.etudiant.membre.nom)
 
+    __repr__=__str__
 
