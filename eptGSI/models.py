@@ -3,15 +3,12 @@ from djongo.storage import GridFSStorage
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.validators import RegexValidator
-
-
+from django.utils.timezone import now
 
 
 cv_grid_fs_storage = GridFSStorage(collection='cvs', base_url=''.join([settings.BASE_URL, 'cvs/']))
 rapport_grid_fs_storage = GridFSStorage(collection='rapports', base_url=''.join([settings.BASE_URL, 'rapports/']))
 pj_grid_fs_storage = GridFSStorage(collection='pjs', base_url=''.join([settings.BASE_URL, 'pjs/']))
-
-# Create your models here.
 
 
 
@@ -44,11 +41,6 @@ class Etudiant(models.Model):
     def __str__(self):
         return str(self.membre.prenom + ' '+ self.membre.nom )
 
-    # class meta:
-    #     permissions=[
-    #         ("is_student","is student")
-    #     ]
-
 
 class Entreprise(models.Model):
     nom_entreprise = models.CharField(max_length=100)
@@ -56,10 +48,15 @@ class Entreprise(models.Model):
     domaine_expertise = models.CharField(max_length=100,blank=True,
         null=True)
 
+    def __str__(self):
+        return str(self.nom_entreprise)
+
   
 class Programme(models.Model):
-    pass
     
+    def __str__(self):
+        return str('Programme '+ str(self.id))
+
       
 class Immersion(models.Model):
     description = models.TextField()
@@ -68,6 +65,8 @@ class Immersion(models.Model):
     entreprise= models.ForeignKey(Entreprise, related_name="Immersion", on_delete=models.CASCADE)
     programme = models.ForeignKey(Programme, related_name="Immersion", on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str('Immersion '+ self.entreprise.nom_entreprise+' '+ str(self.id))
 
 class Stage(models.Model):
     annee = models.DateField(max_length=100)
@@ -78,17 +77,16 @@ class Stage(models.Model):
     etudiant = models.ForeignKey(Etudiant, related_name="Stage", on_delete=models.CASCADE)
     immersion = models.ForeignKey(Immersion, related_name="Stage", on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str('Stage '+ self.etudiant.membre.prenom+' '+ self.etudiant.membre.nom+' '+ self.annee )
+
 
 class MaitreStage(models.Model):
     membre = models.ForeignKey(Membre, related_name = "MaitreStage", on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.membre.prenom+' '+ self.membre.nom)
 
-class Planning(models.Model):
-    annee = models.DateField()
-    etudiant = models.ForeignKey(Etudiant, related_name="Planning", on_delete=models.CASCADE)
-    maitreStage = models.ForeignKey(MaitreStage, related_name="Planning", on_delete=models.CASCADE)
-    
-    
 class Projet(models.Model):
     nom_projet = models.CharField(max_length=100)
     descriptif_projet = models.TextField(blank=True,
@@ -96,14 +94,28 @@ class Projet(models.Model):
     etat = models.CharField(max_length=100,blank=True,
         null=True)
     programme = models.ForeignKey(Programme, related_name = "Projet", on_delete=models.PROTECT)
-    planning = models.ForeignKey(Planning, related_name = "Projet", on_delete=models.PROTECT)
 
+    def __str__(self):
+        return str(self.nom_projet)
+
+
+class Planning(models.Model):
+    annee = models.DateField()
+    etudiant = models.ForeignKey(Etudiant, related_name="Planning", on_delete=models.CASCADE)
+    maitreStage = models.ForeignKey(MaitreStage, related_name="Planning", on_delete=models.CASCADE)
+    projets = models.ManyToManyField(Projet)
+    
+    def __str__(self):
+        return str('Planning '+ self.etudiant.membre.prenom+' '+ self.etudiant.membre.nom+ ' '+ self.annee )
+    
 
 class Tache(models.Model):
     intitule = models.CharField(max_length=100)
     projet = models.ForeignKey(Projet, related_name = "Tache",on_delete=models.PROTECT)
 
-
+    def __str__(self):
+        return str(self.intitule)
+    
 class SousTache(models.Model):
     nom_tache = models.CharField(max_length=100)
     echeance = models.DateField(blank=True,null=True)
@@ -114,10 +126,15 @@ class SousTache(models.Model):
     etat = models.BooleanField(default = False)
     tache = models.ForeignKey(Tache, related_name = "SousTache",blank=True,null=True, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return str(self.nom_tache)
+
 
 class Destinataire(models.Model):
     label=models.CharField(max_length=100)
 
+    def __str__(self):
+        return str(self.label)
 
 class Evenement(models.Model):
     details = models.TextField()
@@ -125,29 +142,46 @@ class Evenement(models.Model):
     date = models.DateField()
     destinataires = models.ManyToManyField(Destinataire)
 
+    def __str__(self):
+        return str(self.intitule)
+
 
 class PieceJointe(models.Model):
     fichier = models.FileField(upload_to='pjs', storage=pj_grid_fs_storage)
     evenement = models.ForeignKey(Evenement, related_name="PieceJointe", on_delete = models.CASCADE)
 
-
+    def __str__(self):
+        return str('Piece Jointe '+ self.evenement.intitule)
 
 class MembreDept(models.Model):
     membre = models.ForeignKey(Membre, related_name = "MembreDept", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.membre.prenom + ' '+ self.membre.nom)
 
 
 class RespEntreprise(models.Model): 
     membre = models.ForeignKey(Membre, related_name = "RespEntreprise",on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.membre.prenom + ' '+ self.membre.nom)
+
 
 class ChefDept(models.Model):
     membre = models.ForeignKey(Membre, related_name = "ChefDept", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.membre.prenom + ' '+ self.membre.nom)
 
 
 class Message(models.Model):
     intitule = models.CharField(max_length=100)
     contenu = models.TextField()
     etudiant = models.ForeignKey(Etudiant, related_name = "Message", on_delete=models.PROTECT)
+    date_envoi = models.DateTimeField(default=now, editable=False)  #auto_now_add = True
+
+    def __str__(self):
+        return str(self.intitule)
 
 
 class Evaluation(models.Model):
@@ -156,5 +190,7 @@ class Evaluation(models.Model):
     etudiant = models.ForeignKey(Etudiant, related_name = "Evaluation", on_delete=models.PROTECT)
     maitre_de_stage = models.ForeignKey(MaitreStage, related_name = "Evaluation", on_delete = models.PROTECT)
 
+    def __str__(self):
+        return str('Evaluation '+ self.etudiant.membre.prenom + ' '+ self.etudiant.membre.nom)
 
 

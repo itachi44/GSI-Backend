@@ -24,7 +24,7 @@ class MembreSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             'email': {'validators': []},
-            'telephone': {'validators': []}
+            #'telephone': {'validators': []}
         }
 
     def create(self, validated_data):
