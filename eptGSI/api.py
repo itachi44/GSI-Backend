@@ -20,7 +20,7 @@ from .authentication import *
 
 class EtudiantViewSet(ModelViewSet):
     serializer_class= EtudiantSerializer
-    permission_classes=(IsStudentAuthenticated,)
+    #permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
     def get_queryset(self):
@@ -423,7 +423,7 @@ class GetTokenViewSet(ModelViewSet):
 
         compte_serializer=CompteSerializer(data=request.data)
         if not compte_serializer.is_valid():
-            return Response(compte_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Données invalides'}, status = status.HTTP_400_BAD_REQUEST)
 
         user= authenticate(
             username = compte_serializer.data['identifiant'],
