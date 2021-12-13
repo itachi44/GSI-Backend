@@ -437,11 +437,13 @@ class GetTokenViewSet(ModelViewSet):
         #token_expire_handler will check, if the token is expired it will generate new one
         is_expired, token = token_expire_handler(token)    
         user_serialized = UserSerializer(user)
-
+        permission=list(user.get_all_permissions())[0]
+        print(permission.split(".")[1])
 
         return Response({
         'user': user_serialized.data, 
         'expires_in': expires_in(token),
-        'token': token.key
+        'token': token.key,
+        'permissions':permission.split(".")[1]
             }, status=status.HTTP_200_OK)
 
