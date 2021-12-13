@@ -28,9 +28,10 @@ router.register(r'message', MessageViewSet, basename='Message')
 router.register(r'evenement', EvenementViewSet, basename='Evenement')
 router.register(r'pieceJointe', PieceJointeViewSet, basename='PieceJointe')
 
-#URIs pour obtenir et rafraichir un token
+#URIs pour la connexion et la deconnexion 
 router.register(r'login', GetTokenViewSet, basename='Obtain_token')
-# router.register(r'refresh_token', RefreshTokenViewSet, basename='Refresh_token')
+router.register(r'logout', logOut, basename='LogOut')
+
 
 
 urlpatterns = [

@@ -13,6 +13,7 @@ from rest_framework import status
 from .permissions import IsStudentAuthenticated
 from django.contrib.auth import authenticate
 from .authentication import *
+from django.contrib.auth import logout
 
 
 
@@ -444,6 +445,18 @@ class GetTokenViewSet(ModelViewSet):
         'user': user_serialized.data, 
         'expires_in': expires_in(token),
         'token': token.key,
-        'permissions':permission.split(".")[1]
+        'userType':permission.split(".")[1]
             }, status=status.HTTP_200_OK)
+
+
+#logout user
+
+class logOut(ModelViewSet):
+    http_method_names = ["post","head"]
+
+    def create(self, request, *args, **kwargs):
+        request.user.auth_token.delete()
+        logout(request)
+
+        return Response({'info':'utilisateur deconnecté'},status=status.HTTP_200_OK)
 
