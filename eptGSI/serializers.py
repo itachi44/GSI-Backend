@@ -101,18 +101,23 @@ class EtudiantSerializer(serializers.ModelSerializer):
         return etudiant
 
 
-    def update(self, instance, validated_data,*args, **kwargs):        
-        membre_data = validated_data.pop('membre')
-        membre_serializer = MembreSerializer(data = membre_data,partial=True)        
-        instance.niveau_etude = validated_data.get('niveau_etude', instance.niveau_etude)
-        instance.adresse = validated_data.get('adresse', instance.adresse)
-        if instance.cv:
-            instance.cv.delete()
-        instance.cv = validated_data.get('cv', instance.cv)
-        instance.save()
-        if membre_serializer.is_valid():
-            membre = membre_serializer.update(instance=instance.membre, validated_data=membre_serializer.validated_data)
+    def update(self, instance, validated_data,*args, **kwargs):  
+        print(validated_data)
+        if 'membre' in validated_data.keys():   
+            membre_data = validated_data.pop('membre')
+            membre_serializer = MembreSerializer(data = membre_data,partial=True) 
+            if membre_serializer.is_valid():
+                membre = membre_serializer.update(instance=instance.membre, validated_data=membre_serializer.validated_data)
 
+        if 'niveau_etude' in validated_data.keys():   
+            instance.niveau_etude = validated_data.get('niveau_etude', instance.niveau_etude)
+        if 'adresse' in validated_data.keys():   
+            instance.adresse = validated_data.get('adresse', instance.adresse)
+        if 'cv' in validated_data.keys():
+            if instance.cv:
+                instance.cv.delete()
+            instance.cv = validated_data.get('cv', instance.cv)
+        instance.save()
         return instance
 
 
