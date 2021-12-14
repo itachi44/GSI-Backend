@@ -28,9 +28,9 @@ class EtudiantViewSet(ModelViewSet):
         queryset= Etudiant.objects.all()
 
     
-        etudiant_id = self.request.GET.get('id_etudiant')
-        if etudiant_id is not None:
-            queryset = queryset.filter(id=etudiant_id)
+        email = self.request.GET.get('email')
+        if email is not None:
+            queryset = queryset.filter(membre__email=email)
         return queryset
 
 
@@ -431,7 +431,7 @@ class GetTokenViewSet(ModelViewSet):
             password = compte_serializer.data['mot_de_passe'] 
         )
         if not user:
-            return Response({'detail': 'Invalid Credentials or activate account..'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'informations de connexion invalides.'}, status=status.HTTP_404_NOT_FOUND)
             
         #TOKEN STUFF
         token, _ = Token.objects.get_or_create(user = user)
@@ -439,7 +439,6 @@ class GetTokenViewSet(ModelViewSet):
         is_expired, token = token_expire_handler(token)    
         user_serialized = UserSerializer(user)
         permission=list(user.get_all_permissions())[0]
-        print(permission.split(".")[1])
 
         return Response({
         'user': user_serialized.data, 
