@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.validators import RegexValidator
 from django.utils.timezone import now
+import os
 
 
 cv_grid_fs_storage = GridFSStorage(collection='cvs', base_url=''.join([settings.BASE_URL, 'cvs/']))
@@ -45,6 +46,30 @@ class Etudiant(models.Model):
 
     __repr__=__str__
     
+    #methode pour récupérer le cv
+    def get_cv(self):
+        cv=self.cv
+        cv_data=cv.read()
+        url=cv.url
+        extension=cv.name.split(".")[1]
+        image_id=url.split('/')[4]
+        #1-verifier si le répertoire existe sinon le créer
+        directory="cvs"
+        parent_dir=os.getcwd()
+        path = os.path.join(parent_dir, directory)
+        if not os.path.isdir(os.getcwd()+"/cvs"):
+            os.mkdir(path, mode = 0o777)
+        #vérifier que le fichier n'existe pas encore 
+        image_path=path+'/'+image_id+"."+extension
+        if os.path.isfile(image_path):
+            print("le fichier existe déja")
+        else:
+        #créer le fichier
+            with open(image_path, "wb+") as file:
+                file.write(cv_data)
+        #sauvegarder dans un repertoire avec l'id
+
+
 
 class Entreprise(models.Model):
     nom_entreprise = models.CharField(max_length=100)

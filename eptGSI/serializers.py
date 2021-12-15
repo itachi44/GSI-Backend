@@ -68,7 +68,8 @@ class EtudiantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Etudiant
-        fields=["niveau_etude","adresse","cv","membre"]
+        #TODO enlever cv
+        fields=["niveau_etude","adresse","cv","membre","get_cv"]
 
 
     def create(self, validated_data):

@@ -464,18 +464,3 @@ class logOut(ModelViewSet):
         logout(request)
 
         return Response({'info':'utilisateur deconnecté'},status=status.HTTP_200_OK)
-
-#retrieve files and images
-class retrieveFile(ModelViewSet):
-    http_method_names = ["post","head"]
-    def create(self, request, *args, **kwargs):
-        print(request.data["id_file"])
-        image_id=request.data["id_file"]
-        #image id in posted data
-        client = MongoClient('mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
-        db=client.gsi
-        fs=gridfs.GridFS(db, collection='cvs.cvs')
-        image_data = fs.get(ObjectId(image_id))
-        image=image_data.read()
-        return Response({"file":str(image)},status=status.HTTP_200_OK)
-
