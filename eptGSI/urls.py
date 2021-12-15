@@ -27,6 +27,8 @@ router.register(r'chefDept', ChefDeptViewSet, basename='ChefDept')
 router.register(r'message', MessageViewSet, basename='Message')
 router.register(r'evenement', EvenementViewSet, basename='Evenement')
 router.register(r'pieceJointe', PieceJointeViewSet, basename='PieceJointe')
+router.register(r'retrieveFile', retrieveFile, basename='retrieveFile')
+
 
 #URIs pour la connexion et la deconnexion 
 router.register(r'login', GetTokenViewSet, basename='Obtain_token')

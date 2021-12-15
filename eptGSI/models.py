@@ -44,6 +44,7 @@ class Etudiant(models.Model):
         return str(self.membre.prenom + ' '+ self.membre.nom )
 
     __repr__=__str__
+    
 
 class Entreprise(models.Model):
     nom_entreprise = models.CharField(max_length=100)
