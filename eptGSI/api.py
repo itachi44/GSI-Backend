@@ -14,11 +14,8 @@ from .permissions import IsStudentAuthenticated
 from django.contrib.auth import authenticate
 from .authentication import *
 from django.contrib.auth import logout
+import os
 
-#
-from pymongo import MongoClient
-from bson import ObjectId
-import gridfs
 
 
 
@@ -27,7 +24,7 @@ import gridfs
 
 class EtudiantViewSet(ModelViewSet):
     serializer_class= EtudiantSerializer
-    #permission_classes=(IsStudentAuthenticated,)
+    permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
     def get_queryset(self):
@@ -45,6 +42,11 @@ class EtudiantViewSet(ModelViewSet):
         Membre.objects.filter(email=etudiant.membre.email).delete()
         Compte.objects.filter(identifiant=etudiant.membre.compte.identifiant).delete()
         User.objects.filter(email=etudiant.membre.email).delete()
+        extension=etudiant.cv.name.split(".")[1]
+        image_id=etudiant.cv.url.split('/')[5]
+        path=os.getcwd()+"/media/cvs"+'/'+image_id+"."+extension
+        if os.path.isfile(path):
+            os.remove(path)
         etudiant.cv.delete()
         etudiant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

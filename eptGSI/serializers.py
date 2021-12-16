@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
-
+import os
 
 
 class CompteSerializer(serializers.ModelSerializer):
@@ -116,6 +116,11 @@ class EtudiantSerializer(serializers.ModelSerializer):
             instance.adresse = validated_data.get('adresse', instance.adresse)
         if 'cv' in validated_data.keys():
             if instance.cv:
+                extension=instance.cv.name.split(".")[1]
+                image_id=instance.cv.url.split('/')[5]
+                path=os.getcwd()+"/media/cvs"+'/'+image_id+"."+extension
+                if os.path.isfile(path):
+                    os.remove(path)
                 instance.cv.delete()
             instance.cv = validated_data.get('cv', instance.cv)
         instance.save()

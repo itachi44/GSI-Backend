@@ -7,9 +7,9 @@ from django.utils.timezone import now
 import os
 
 
-cv_grid_fs_storage = GridFSStorage(collection='cvs', base_url=''.join([settings.BASE_URL, 'cvs/']))
-rapport_grid_fs_storage = GridFSStorage(collection='rapports', base_url=''.join([settings.BASE_URL, 'rapports/']))
-pj_grid_fs_storage = GridFSStorage(collection='pjs', base_url=''.join([settings.BASE_URL, 'pjs/']))
+cv_grid_fs_storage = GridFSStorage(collection='media/cvs', base_url=''.join([settings.BASE_URL, 'media/cvs/']))
+rapport_grid_fs_storage = GridFSStorage(collection='media/rapports', base_url=''.join([settings.BASE_URL, 'rapports/']))
+pj_grid_fs_storage = GridFSStorage(collection='media/pjs', base_url=''.join([settings.BASE_URL, 'pjs/']))
 
 
 
@@ -37,7 +37,7 @@ class Membre(models.Model):
 class Etudiant(models.Model):
     niveau_etude = models.CharField(max_length = 100)
     adresse = models.CharField(max_length=100)
-    cv = models.FileField(upload_to='cvs', storage=cv_grid_fs_storage,blank=True,
+    cv = models.FileField(upload_to='media/cvs', storage=cv_grid_fs_storage,blank=True,
         null=True)
     membre = models.ForeignKey(Membre,related_name="Etudiant", on_delete=models.CASCADE)
 
@@ -48,27 +48,27 @@ class Etudiant(models.Model):
     
     #methode pour récupérer le cv
     def get_cv(self):
-        cv=self.cv
-        cv_data=cv.read()
-        url=cv.url
-        extension=cv.name.split(".")[1]
-        image_id=url.split('/')[4]
-        #1-verifier si le répertoire existe sinon le créer
-        directory="cvs"
-        parent_dir=os.getcwd()
-        path = os.path.join(parent_dir, directory)
-        if not os.path.isdir(os.getcwd()+"/cvs"):
-            os.mkdir(path, mode = 0o777)
-        #vérifier que le fichier n'existe pas encore 
-        image_path=path+'/'+image_id+"."+extension
-        if os.path.isfile(image_path):
-            print("le fichier existe déja")
-        else:
-        #créer le fichier
-            with open(image_path, "wb+") as file:
-                file.write(cv_data)
-        #sauvegarder dans un repertoire avec l'id
-
+        if self.cv:
+            cv=self.cv
+            cv_data=cv.read()
+            url=cv.url
+            extension=cv.name.split(".")[1]
+            image_id=url.split('/')[5]
+            #1-verifier si le répertoire existe sinon le créer
+            parent_dir=os.getcwd()
+            if not os.path.isdir(os.getcwd()+"/media"):
+                os.mkdir(os.path.join(parent_dir, "media"), mode = 0o777)
+            if not os.path.isdir(os.getcwd()+"/media/cvs"):
+                os.mkdir(os.getcwd()+"/media/cvs", mode = 0o777)
+            #vérifier que le fichier n'existe pas encore 
+            image_path=os.getcwd()+"/media/cvs"+'/'+image_id+"."+extension
+            if os.path.isfile(image_path):
+                print("le fichier existe déja")
+            else:
+            #créer le fichier
+                with open(image_path, "wb+") as file:
+                    file.write(cv_data)
+            return cv.url+'.'+extension
 
 
 class Entreprise(models.Model):

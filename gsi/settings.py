@@ -31,8 +31,11 @@ if os.environ.get("ENV")=='PRODUCTION':
 else:
     DEBUG=True
 
-ALLOWED_HOSTS = ['127.0.0.1','gsi.herokuapp.com','.gsi.herokuapp.com']
+ALLOWED_HOSTS = []
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+]
 INTERNAL_IPS=[ '127.0.0.1'] #to change
 # Application definition
 
@@ -78,7 +81,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+
 
 ROOT_URLCONF = 'gsi.urls'
 
@@ -157,6 +160,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media/'
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
