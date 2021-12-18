@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
+from rest_framework.exceptions import AuthenticationFailed
 import os
 
 
@@ -582,3 +583,42 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields="__all__"
+
+#reset password serializer
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(min_length=100)
+    class Meta:
+        fields = ['email']
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(
+        min_length=6, max_length=68, write_only=True)
+    token = serializers.CharField(
+        min_length=1, write_only=True)
+    uidb64 = serializers.CharField(
+        min_length=1, write_only=True)
+
+    class Meta:
+        fields = ['password', 'token', 'uidb64']
+
+    def validate(self, attrs):
+        try:
+            password = attrs.get('password')
+            token = attrs.get('token')
+            uidb64 = attrs.get('uidb64')
+
+            id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=id)
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                raise AuthenticationFailed('le lien est invalide', 401)
+
+            user.set_password(password)
+            user.save()
+            #TODO changer le mot de passe du compte membre
+
+            return (user)
+        except Exception as e:
+            raise AuthenticationFailed('le lien est invalide', 401)
+        return super().validate(attrs)

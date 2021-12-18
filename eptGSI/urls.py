@@ -31,7 +31,13 @@ router.register(r'pieceJointe', PieceJointeViewSet, basename='PieceJointe')
 
 #URIs pour la connexion et la deconnexion 
 router.register(r'login', GetTokenViewSet, basename='Obtain_token')
-router.register(r'logout', logOut, basename='LogOut')
+router.register(r'logout', LogOut, basename='LogOut')
+router.register(r'verify_token', VerifyToken, basename='verify_token')
+
+#reset password
+router.register(r'reset_password', ResetPassword, basename='reset_password')
+router.register(r'password_reset/<uidb64>/token', PasswordTokenCheck, basename='password_reset_confirm')
+router.register(r'password_reset_complete/<uidb64>/token', SetNewPassword, basename='password_reset_complete')
 
 
 

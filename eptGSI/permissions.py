@@ -11,7 +11,6 @@ class IsStudentAuthenticated(BasePermission):
         else:
             token, _ = Token.objects.get_or_create(user = request.user)
             is_expired = is_token_expired(token) 
-            print(is_expired)
             if(is_expired):
                 token.delete()
                 request.user.is_authenticated=False

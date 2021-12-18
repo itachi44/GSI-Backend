@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'django_filters'
     ]
 
+
+
 TOKEN_EXPIRED_AFTER_SECONDS = 84600*30 #30j
 
 DATE_INPUT_FORMATS = ['%d/%m/%Y']
@@ -155,6 +157,20 @@ USE_L10N = True
 
 USE_TZ = True
 
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
+
+RECIPIENT_ADDRESS = env('RECIPIENT_ADDRESS')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

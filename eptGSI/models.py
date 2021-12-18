@@ -256,3 +256,8 @@ class Evaluation(models.Model):
 
     __repr__=__str__
 
+#password reset token
+
+class PasswordReset(models.Model):
+    key = models.CharField(max_length=200)
+    uidb= models.CharField(max_length=100)

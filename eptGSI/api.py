@@ -14,9 +14,14 @@ from .permissions import IsStudentAuthenticated
 from django.contrib.auth import authenticate
 from .authentication import *
 from django.contrib.auth import logout
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import smart_str, force_str,force_bytes, smart_bytes, DjangoUnicodeDecodeError
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+from .utils import Util
 import os
-
-
+import time
 
 
 
@@ -24,7 +29,7 @@ import os
 
 class EtudiantViewSet(ModelViewSet):
     serializer_class= EtudiantSerializer
-    permission_classes=(IsStudentAuthenticated,)
+    #permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
     def get_queryset(self):
@@ -451,18 +456,102 @@ class GetTokenViewSet(ModelViewSet):
         return Response({
         'user': user_serialized.data, 
         'expires_in': expires_in(token),
+        'created_at': token.created,
         'token': token.key,
         'userType':permission.split(".")[1]
             }, status=status.HTTP_200_OK)
 
 
+#verifier le token
+class VerifyToken(ModelViewSet):
+    http_method_names = ["post","head"]
+    def create(self, request, *args, **kwargs):
+        token=request.data["token"]
+        token=Token.objects.get(key = token)
+        if(token):
+            if not is_token_expired(token):
+                return Response({'info':'token valide'},status=status.HTTP_200_OK)
+            else:
+                return Response({'info':'token invalide'},status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'info':'token invalide'},status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
 #logout user
 
-class logOut(ModelViewSet):
+class LogOut(ModelViewSet):
     http_method_names = ["post","head"]
 
     def create(self, request, *args, **kwargs):
-        request.user.auth_token.delete()
+        #request.user.auth_token.delete()
         logout(request)
 
         return Response({'info':'utilisateur deconnecté'},status=status.HTTP_200_OK)
+
+
+#password reset
+
+class ResetPassword(ModelViewSet):
+    http_method_names = ["post","head"]
+    serializer_class=ResetPasswordSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        serializer=ResetPasswordSerializer(data=request.data)
+        email=request.data["email"]
+        if User.objects.filter(email=email).exists():
+            user=User.objects.get(email=email)
+            uidb64=urlsafe_base64_encode(force_bytes(user.id))
+            token=PasswordResetTokenGenerator().make_token(user)
+            absurl = request.META['HTTP_ORIGIN']+"/reset_password/"+"?uidb="+uidb64+"&key="+token
+            email_body = 'Bonjour '+user.username + \
+                    'Utilisez ce lien pour reinitialiser votre mot de passe \n' + absurl
+            data = {'email_body': email_body, 'to_email': user.email,
+                        'email_subject': 'Reinitialiser mot de passe.'}
+            print(absurl)
+            #TODO save the token in the database
+            PasswordReset.objects.create(uidb=uidb64,key=token)
+
+            Util.send_email(data)
+        return Response({'info':'Le lien pour réinitialiser votre mot de passe a été envoyé dans votre boite mail.'},status=status.HTTP_200_OK)
+
+
+
+class PasswordTokenCheck(ModelViewSet):
+    def get (self, request,uidb64,token):
+        redirect_url = request.GET.get('redirect_url')
+
+        try:
+            id = smart_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=id)
+
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                if len(redirect_url) > 3:
+                    return CustomRedirect(redirect_url+'?token_valid=False')
+                else:
+                    return CustomRedirect(os.environ.get('FRONTEND_URL', '')+'?token_valid=False')
+
+            if redirect_url and len(redirect_url) > 3:
+                return CustomRedirect(redirect_url+'?token_valid=True&message=Credentials Valid&uidb64='+uidb64+'&token='+token)
+            else:
+                return CustomRedirect(os.environ.get('FRONTEND_URL', '')+'?token_valid=False')
+
+        except DjangoUnicodeDecodeError as identifier:
+            try:
+                if not PasswordResetTokenGenerator().check_token(user):
+                    return CustomRedirect(redirect_url+'?token_valid=False')
+                    
+            except UnboundLocalError as e:
+                return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SetNewPassword(ModelViewSet):
+    http_method_names = ["patch","head"]
+    serializer_class = SetNewPasswordSerializer
+
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({'success': True, 'message': 'le mot de passe a été réinitialisé avec succès.'}, status=status.HTTP_200_OK)
