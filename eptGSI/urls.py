@@ -3,12 +3,11 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 from django.urls import path, include
 from . import views
 from .api import *
+from .permissions import *
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_swagger.views import get_swagger_view
-schema_view = get_swagger_view(title='GESTION ET SUIVI DES IMMERSIONS : API')
-from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework import response, schemas
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
 
 #Les endpoints pour toutes les fonctionnalités
 router = SimpleRouter()
@@ -53,14 +52,17 @@ router.register(r'password_reset_check', PasswordTokenCheck, basename='password_
 router.register(r'password_reset_complete', SetNewPassword, basename='password_reset_complete')
 
 
-@api_view()
-@renderer_classes([SwaggerUIRenderer, OpenAPIRenderer])
-def schema_view(request):
-    generator = schemas.SchemaGenerator(title='GESTION ET SUIVI DES IMMERSIONS : API')
-    return response.Response(generator.get_schema(request=request))
-
+schema_view = get_schema_view(
+    openapi.Info(
+        title="GESTION ET SUIVI DES IMMERSIONS :API",
+        default_version='v1',
+        description="URIs de l'API :",
+    ),
+    public=True,
+    permission_classes=(),
+)
 
 urlpatterns = [
     url(r'api/', include(router.urls)),
-    url(r'^$', schema_view, name='documentation'), 
+    url(r'^$', schema_view.with_ui('swagger', cache_timeout=None), name='documentation'),
 ]

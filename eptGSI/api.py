@@ -27,7 +27,7 @@ import time
 #les vues de l'API
 class StagiairePedagogiqueViewSet(ModelViewSet):
     serializer_class= StagiairePedagogiqueSerializer
-    permission_classes=(IsStudentAuthenticated,)
+    permission_classes=(IsStudentAuthenticated,IsMaitreStageAuthenticated,IsFormateurAuthenticated,IsManagerAuthenticated,IsResponsableImmersionAuthenticated)
     filter_fields=["niveau_etude","membre"]
 
 
@@ -661,7 +661,7 @@ class PasswordTokenCheck(ModelViewSet):
 
 
 class SetNewPassword(ModelViewSet):
-    http_method_names = ["patch","head"]
+    http_method_names = ["patch"]
     serializer_class = SetNewPasswordSerializer
 
 
