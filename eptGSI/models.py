@@ -96,8 +96,7 @@ class Alternance(models.Model):
     description = models.TextField()
     date_debut = models.DateField()
     date_fin = models.DateField()
-    convention = models.FileField(upload_to='media/conventions', storage=convention_grid_fs_storage,blank=True,
-        null=True)
+    convention = models.FileField(upload_to='media/conventions', storage=convention_grid_fs_storage,blank=True,null=True)
     entreprise= models.ForeignKey(Entreprise, related_name="Alternance", on_delete=models.PROTECT)
     planning = models.ForeignKey(Planning, related_name="Alternance",blank=True,
         null=True, on_delete=models.CASCADE)
@@ -339,13 +338,14 @@ class ResponsableImmersion(models.Model):
 class Message(models.Model):
     intitule = models.CharField(max_length=100)
     contenu = models.TextField()
-    etudiant = models.ForeignKey(Etudiant, related_name = "Message", on_delete=models.PROTECT)
+    stagiaire_pedagogique = models.ForeignKey(StagiairePedagogique, related_name = "Message", on_delete=models.PROTECT)
     date_envoi = models.DateTimeField(default=now, editable=False)  #auto_now_add = True
 
     def __str__(self):
         return str(self.intitule)
 
     __repr__=__str__
+
 
 
 class GrilleEvaluation(models.Model):

@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from .serializers import *
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .models import Etudiant, Membre, Compte
+from .models import *
 import django_filters.rest_framework
 from django.http.response import JsonResponse
 from rest_framework.permissions import IsAuthenticated
