@@ -10,7 +10,7 @@ from django.db import transaction
 from rest_framework.decorators import action
 from django.http import Http404
 from rest_framework import status
-from .permissions import IsStudentAuthenticated
+from .permissions import *
 from django.contrib.auth import authenticate
 from .authentication import *
 from django.contrib.auth import logout
@@ -27,7 +27,7 @@ import time
 #les vues de l'API
 class StagiairePedagogiqueViewSet(ModelViewSet):
     serializer_class= StagiairePedagogiqueSerializer
-    #permission_classes=(IsStudentAuthenticated,)
+    permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
 
@@ -595,6 +595,7 @@ class GetTokenViewSet(ModelViewSet):
 
 class VerifyToken(ModelViewSet):
     http_method_names = ["post","head"]
+    serializer_class=TokenSerializer
 
 
     def create(self, request, *args, **kwargs):
@@ -610,13 +611,13 @@ class VerifyToken(ModelViewSet):
 
 
 class LogOut(ModelViewSet):
-    http_method_names = ["post","head"]
+    http_method_names = ["post"]
+    serializer_class=UserSerializer
 
 
     def create(self, request, *args, **kwargs):
         #request.user.auth_token.delete()
         logout(request)
-
         return Response({'info':'utilisateur deconnecté'},status=status.HTTP_200_OK)
 
 
@@ -645,6 +646,7 @@ class ResetPassword(ModelViewSet):
 
 class PasswordTokenCheck(ModelViewSet):
     http_method_names = ["post","head"]
+    serializer_class=PasswordTokenCheckSerializer
 
 
     def create(self, request, *args, **kwargs):

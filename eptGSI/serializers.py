@@ -613,6 +613,7 @@ class ManagerSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        print(self.context["request.user"])
         maitre_stage = validated_data.pop('maitre_stage')
         membre = maitre_stage.pop('membre')
         compte= membre.pop('compte')
@@ -960,6 +961,20 @@ class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(min_length=100)
     class Meta:
         fields = ['email']
+
+
+#token serializer
+class TokenSerializer(serializers.Serializer):
+    token = serializers.CharField(min_length=100)
+    class Meta:
+        fields = ['token']
+
+
+class PasswordTokenCheckSerializer(serializers.Serializer):
+    token = serializers.CharField(min_length=100)
+    uidb =serializers.CharField(max_length=100)
+    class Meta:
+        fields = ['token','uidb']
 
 
 class SetNewPasswordSerializer(serializers.Serializer):
