@@ -24,17 +24,15 @@ import os
 import time
 
 
-#Vues API
-
-class EtudiantViewSet(ModelViewSet):
-    serializer_class= EtudiantSerializer
-    permission_classes=(IsStudentAuthenticated,)
+#les vues de l'API
+class StagiairePedagogiqueViewSet(ModelViewSet):
+    serializer_class= StagiairePedagogiqueSerializer
+    #permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
-    def get_queryset(self):
-        queryset= Etudiant.objects.all()
 
-    
+    def get_queryset(self):
+        queryset= StagiairePedagogique.objects.all()
         email = self.request.GET.get('email')
         if email is not None:
             queryset = queryset.filter(membre__email=email)
@@ -42,19 +40,19 @@ class EtudiantViewSet(ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-        etudiant=self.get_object()
-        Membre.objects.filter(email=etudiant.membre.email).delete()
-        Compte.objects.filter(identifiant=etudiant.membre.compte.identifiant).delete()
-        User.objects.filter(email=etudiant.membre.email).delete()
-        extension=etudiant.cv.name.split(".")[1]
-        image_id=etudiant.cv.url.split('/')[5]
-        path=os.getcwd()+"/media/cvs"+'/'+image_id+"."+extension
-        if os.path.isfile(path):
-            os.remove(path)
-        etudiant.cv.delete()
-        etudiant.delete()
+        stagiaire_pedagogique=self.get_object()
+        Membre.objects.filter(email=stagiaire_pedagogique.membre.email).delete()
+        Compte.objects.filter(identifiant=stagiaire_pedagogique.membre.compte.identifiant).delete()
+        User.objects.filter(email=stagiaire_pedagogique.membre.email).delete()
+        if(stagiaire_pedagogique.cv):
+            extension=stagiaire_pedagogique.cv.name.split(".")[1]
+            image_id=stagiaire_pedagogique.cv.url.split('/')[5]
+            path=os.getcwd()+"/media/cvs"+'/'+image_id+"."+extension
+            if os.path.isfile(path):
+                os.remove(path)
+            stagiaire_pedagogique.cv.delete()
+        stagiaire_pedagogique.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 
         
@@ -74,7 +72,6 @@ class MembreViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         membre=self.get_object()
-        print(membre)
         Compte.objects.filter(identifiant=membre.compte.identifiant).delete()
         membre.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -93,28 +90,6 @@ class CompteViewSet(ModelViewSet):
         if compte_id is not None:
             queryset = queryset.filter(id=compte_id)
         return queryset
-
-
-
-class ImmersionViewSet(ModelViewSet):
-    serializer_class= ImmersionSerializer
-    #permission_classes=(IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset= Immersion.objects.all()
-    
-        immersion_id = self.request.GET.get('id_immersion')
-        if immersion_id is not None:
-            queryset = queryset.filter(id=immersion_id)
-        return queryset
-    
-
-    def destroy(self, request, *args, **kwargs):
-        immersion=self.get_object()
-        Programme.objects.filter(id=immersion.programme.id).delete()
-        immersion.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
 
 
 class EntrepriseViewSet(ModelViewSet):
@@ -142,25 +117,28 @@ class ProgrammeViewSet(ModelViewSet):
         if programme_id is not None:
             queryset = queryset.filter(id=programme_id)
         return queryset
+    
+    def destroy(self, request, *args, **kwargs):
+        programme=self.get_object()
+        programme.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class StageViewSet(ModelViewSet):
-    serializer_class= StageSerializer
+class ActiviteViewSet(ModelViewSet):
+    serializer_class= ActiviteSerializer
     #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
-        queryset= Stage.objects.all()
+        queryset= Activite.objects.all()
     
-        stage_id = self.request.GET.get('id_stage')
-        if stage_id is not None:
-            queryset = queryset.filter(id=stage_id)
+        activite_id = self.request.GET.get('id_activite')
+        if activite_id is not None:
+            queryset = queryset.filter(id=activite_id)
         return queryset
-
-
+    
     def destroy(self, request, *args, **kwargs):
-        stage=self.get_object()
-        stage.rapport_stage.delete()
-        stage.delete()
+        activite=self.get_object()
+        activite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -177,7 +155,83 @@ class PlanningViewSet(ModelViewSet):
             queryset = queryset.filter(id=planning_id)
         return queryset
 
+
+class AlternanceViewSet(ModelViewSet):
+    serializer_class= AlternanceSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Alternance.objects.all()
     
+        alternance_id = self.request.GET.get('id_alternance')
+        if alternance_id is not None:
+            queryset = queryset.filter(id=alternance_id)
+        return queryset
+    
+
+    def destroy(self, request, *args, **kwargs):
+        alternance=self.get_object()
+        Planning.objects.filter(id=alternance.planning._id).delete()
+        if(alternance.convention):
+            extension=alternance.convention.name.split(".")[1]
+            image_id=alternance.convention.url.split('/')[5]
+            path=os.getcwd()+"/media/conventions"+'/'+image_id+"."+extension
+            if os.path.isfile(path):
+                os.remove(path)
+            alternance.convention.delete()
+        alternance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class ImmersionViewSet(ModelViewSet):
+    serializer_class= ImmersionSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Immersion.objects.all()
+    
+        immersion_id = self.request.GET.get('id_immersion')
+        if immersion_id is not None:
+            queryset = queryset.filter(id=immersion_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        immersion=self.get_object()
+        if (immersion.rapport_stage):
+            extension=immersion.rapport_stage.name.split(".")[1]
+            image_id=immersion.rapport_stage.url.split('/')[5]
+            path=os.getcwd()+"/media/rapports"+'/'+image_id+"."+extension
+            if os.path.isfile(path):
+                os.remove(path)
+            immersion.rapport_stage.delete()
+        immersion.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class MaitreStageViewSet(ModelViewSet):
+    serializer_class= MaitreStageSerializer
+    #permission_classes=(IsMaitreStageAuthenticated,)
+    filter_fields=["membre"]
+
+    def get_queryset(self):
+        queryset= MaitreStage.objects.all()
+    
+        maitre_stage_id = self.request.GET.get('id_maitre_stage')
+        if maitre_stage_id is not None:
+            queryset = queryset.filter(id=maitre_stage_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        maitre_stage=self.get_object()
+        Membre.objects.filter(email=maitre_stage.membre.email).delete()
+        Compte.objects.filter(identifiant=maitre_stage.membre.compte.identifiant).delete()
+        User.objects.filter(email=maitre_stage.membre.email).delete()
+        maitre_stage.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class ProjetViewSet(ModelViewSet):
     serializer_class= ProjetSerializer
     #permission_classes=(IsAuthenticated,)
@@ -189,6 +243,11 @@ class ProjetViewSet(ModelViewSet):
         if projet_id is not None:
             queryset = queryset.filter(id=projet_id)
         return queryset
+    
+    def destroy(self, request, *args, **kwargs):
+        projet=self.get_object()
+        projet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TacheViewSet(ModelViewSet):
@@ -236,154 +295,7 @@ class DestinataireViewSet(ModelViewSet):
         if destinataire_id is not None:
             queryset = queryset.filter(id=destinataire_id)
         return queryset
-    
-
-class MembreDeptViewSet(ModelViewSet):
-    serializer_class= MembreDeptSerializer
-    #permission_classes=(IsAuthenticated,)
-    filter_fields=["membre"]
-
-    def get_queryset(self):
-        queryset= MembreDept.objects.all()
-    
-        membreDept_id = self.request.GET.get('id_membreDept')
-        if membreDept_id is not None:
-            queryset = queryset.filter(id=membreDept_id)
-        return queryset
-
-
-    def destroy(self, request, *args, **kwargs):
-        membreDept=self.get_object()
-        Membre.objects.filter(email=membreDept.membre.email).delete()
-        Compte.objects.filter(identifiant=membreDept.membre.compte.identifiant).delete()
-        membreDept.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class StageViewSet(ModelViewSet):
-    serializer_class= StageSerializer
-    #permission_classes=(IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset= Stage.objects.all()
-    
-        stage_id = self.request.GET.get('id_stage')
-        if stage_id is not None:
-            queryset = queryset.filter(id=stage_id)
-        return queryset
-
-
-    def destroy(self, request, *args, **kwargs):
-        stage=self.get_object()
-        stage.rapport_stage.delete()
-        stage.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-class MaitreStageViewSet(ModelViewSet):
-    serializer_class= MaitreStageSerializer
-    #permission_classes=(IsAuthenticated,)
-    filter_fields=["membre"]
-
-    def get_queryset(self):
-        queryset= MaitreStage.objects.all()
-    
-        maitreStage_id = self.request.GET.get('id_maitreStage')
-        if maitreStage_id is not None:
-            queryset = queryset.filter(id=maitreStage_id)
-        return queryset
-
-
-    def destroy(self, request, *args, **kwargs):
-        maitreStage=self.get_object()
-        Membre.objects.filter(email=maitreStage.membre.email).delete()
-        Compte.objects.filter(identifiant=maitreStage.membre.compte.identifiant).delete()
-        maitreStage.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    
-class RespEntrepriseViewSet(ModelViewSet):
-    serializer_class= RespEntrepriseSerializer
-    #permission_classes=(IsAuthenticated,)
-    filter_fields=["membre"]
-
-    def get_queryset(self):
-        queryset= RespEntreprise.objects.all()
-    
-        respEntreprise_id = self.request.GET.get('id_respEntreprise')
-        if respEntreprise_id is not None:
-            queryset = queryset.filter(id=respEntreprise_id)
-        return queryset
-
-
-    def destroy(self, request, *args, **kwargs):
-        respEntreprise=self.get_object()
-        Membre.objects.filter(email=respEntreprise.membre.email).delete()
-        Compte.objects.filter(identifiant=respEntreprise.membre.compte.identifiant).delete()
-        respEntreprise.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    
-class ChefDeptViewSet(ModelViewSet):
-    serializer_class= ChefDeptSerializer
-    #permission_classes=(IsAuthenticated,)
-    filter_fields=["membre"]
-
-    def get_queryset(self):
-        queryset= ChefDept.objects.all()
-    
-        chefDept_id = self.request.GET.get('id_chefDept')
-        if chefDept_id is not None:
-            queryset = queryset.filter(id=chefDept_id)
-        return queryset
-
-
-    def destroy(self, request, *args, **kwargs):
-        chefDept=self.get_object()
-        Membre.objects.filter(email=chefDept.membre.email).delete()
-        Compte.objects.filter(identifiant=chefDept.membre.compte.identifiant).delete()
-        chefDept.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class MessageViewSet(ModelViewSet):
-    serializer_class= MessageSerializer
-    #permission_classes=(IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset= Message.objects.all()
-    
-        message_id = self.request.GET.get('id_message')
-        if message_id is not None:
-            queryset = queryset.filter(id=message_id)
-        return queryset
-
-
-    def destroy(self, request, *args, **kwargs):
-        message=self.get_object()
-        message.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    
-class EvaluationViewSet(ModelViewSet):
-    serializer_class= EvaluationSerializer
-    #permission_classes=(IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset= Evaluation.objects.all()
-    
-        evaluation_id = self.request.GET.get('id_evaluation')
-        if evaluation_id is not None:
-            queryset = queryset.filter(id=evaluation_id)
-        return queryset
-
-
-    def destroy(self, request, *args, **kwargs):
-        evaluation=self.get_object()
-        evaluation.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
+  
 
 class EvenementViewSet(ModelViewSet):
     serializer_class= EvenementSerializer
@@ -418,21 +330,242 @@ class PieceJointeViewSet(ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-        pieceJointe=self.get_object()
-        pieceJointe.fichier.delete()
-        pieceJointe.delete()
+        piece_jointe=self.get_object()
+        if(piece_jointe.fichier):
+            extension=piece_jointe.fichier.name.split(".")[1]
+            image_id=piece_jointe.fichier.url.split('/')[5]
+            path=os.getcwd()+"/media/pjs"+'/'+image_id+"."+extension
+            if os.path.isfile(path):
+                os.remove(path)
+            piece_jointe.fichier.delete()
+        piece_jointe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-#get Token view
+class FormateurViewSet(ModelViewSet):
+    serializer_class= FormateurSerializer
+    #permission_classes=(IsFormateurAuthenticated,)
+    filter_fields=["membre"]
+
+    def get_queryset(self):
+        queryset= Formateur.objects.all()
+    
+        formateur_id = self.request.GET.get('id_formateur')
+        if formateur_id is not None:
+            queryset = queryset.filter(id=formateur_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        formateur=self.get_object()
+        Membre.objects.filter(email=formateur.membre.email).delete()
+        Compte.objects.filter(identifiant=formateur.membre.compte.identifiant).delete()
+        User.objects.filter(email=formateur.membre.email).delete()
+        formateur.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ManagerViewSet(ModelViewSet):
+    serializer_class= ManagerSerializer
+    #permission_classes=(IsManagerAuthenticated,)
+    filter_fields=["maitre_stage"]
+
+    def get_queryset(self):
+        queryset= Manager.objects.all()
+    
+        manager_id = self.request.GET.get('id_manager')
+        if manager_id is not None:
+            queryset = queryset.filter(id=manager_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        manager=self.get_object()
+        MaitreStage.objects.filter(id=manager.maitre_stage.id).delete()
+        Membre.objects.filter(email=manager.maitre_stage.membre.email).delete()
+        Compte.objects.filter(identifiant=manager.maitre_stage.membre.compte.identifiant).delete()
+        User.objects.filter(email=manager.maitre_stage.membre.email).delete()
+        manager.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)   
+
+
+class ResponsableImmersionViewSet(ModelViewSet):
+    serializer_class= ResponsableImmersionSerializer
+    #permission_classes=(IsResponsableImmersionAuthenticated,)
+    filter_fields=["formateur"]
+
+    def get_queryset(self):
+        queryset= ResponsableImmersion.objects.all()
+        responsable_immersion_id = self.request.GET.get('id_responsable_immersion')
+        if responsable_immersion_id is not None:
+            queryset = queryset.filter(id=responsable_immersion_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        responsable_immersion=self.get_object()
+        Formateur.objects.filter(id=responsable_immersion.formateur.id).delete()
+        Membre.objects.filter(email=responsable_immersion.formateur.membre.email).delete()
+        Compte.objects.filter(identifiant=responsable_immersion.formateur.membre.compte.identifiant).delete()
+        User.objects.filter(email=responsable_immersion.formateur.membre.email).delete()
+        responsable_immersion.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class MessageViewSet(ModelViewSet):
+    serializer_class= MessageSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Message.objects.all()
+    
+        message_id = self.request.GET.get('id_message')
+        if message_id is not None:
+            queryset = queryset.filter(id=message_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        message=self.get_object()
+        message.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class GrilleEvaluationViewSet(ModelViewSet):
+    serializer_class= GrilleEvaluationSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= GrilleEvaluation.objects.all()
+        grille_id = self.request.GET.get('id_grille')
+        if grille_id is not None:
+            queryset = queryset.filter(id=grille_id)
+        return queryset
+    
+    def destroy(self, request, *args, **kwargs):
+        grille=self.get_object()
+        Critere.objects.filter(grille_id=grille.id).delete()
+        grille.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+     
+
+class CritereViewSet(ModelViewSet):
+    serializer_class= CritereSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Critere.objects.all()
+        critere_id = self.request.GET.get('id_critere')
+        if critere_id is not None:
+            queryset = queryset.filter(id=critere_id)
+        return queryset
+    
+    def destroy(self, request, *args, **kwargs):
+        critere=self.get_object()
+        critere.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class EvaluationViewSet(ModelViewSet):
+    serializer_class= EvaluationSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Evaluation.objects.all()
+        evaluation_id = self.request.GET.get('id_evaluation')
+        if evaluation_id is not None:
+            queryset = queryset.filter(id=evaluation_id)
+        return queryset
+    
+    
+    def destroy(self, request, *args, **kwargs):
+        evaluation=self.get_object()
+        evaluation.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class EvaluationPartielleViewSet(ModelViewSet):
+    serializer_class= EvaluationPartielleSerializer
+    #permission_classes=(IsAuthenticated,)
+    filter_fields=["evaluation"]
+
+    def get_queryset(self):
+        queryset= EvaluationPartielle.objects.all()
+        evaluation_partielle_id = self.request.GET.get('id_evaluation_partielle')
+        if evaluation_partielle_id is not None:
+            queryset = queryset.filter(id=evaluation_partielle_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        evaluation_partielle=self.get_object()
+        Evaluation.objects.filter(id=evaluation_partielle.evaluation.id).delete()
+        evaluation_partielle.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+     
+    
+class EvaluationFinaleViewSet(ModelViewSet):
+    serializer_class= EvaluationFinaleSerializer
+    #permission_classes=(IsAuthenticated,)
+    filter_fields=["evaluation"]
+
+    def get_queryset(self):
+        queryset= EvaluationFinale.objects.all()
+        evaluation_finale_id = self.request.GET.get('id_evaluation_finale')
+        if evaluation_finale_id is not None:
+            queryset = queryset.filter(id=evaluation_finale_id)
+        return queryset
+
+
+    def destroy(self, request, *args, **kwargs):
+        evaluation_finale=self.get_object()
+        Evaluation.objects.filter(id=evaluation_finale.evaluation.id).delete()
+        evaluation_finale.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+      
+class EvaluationApprentissageViewSet(ModelViewSet):
+    serializer_class= EvaluationApprentissageSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= EvaluationApprentissage.objects.all()
+        evaluation_apprentissage_id = self.request.GET.get('id_evaluation_apprentissage')
+        if evaluation_apprentissage_id is not None:
+            queryset = queryset.filter(id=evaluation_apprentissage_id)
+        return queryset
+    
+    
+    def destroy(self, request, *args, **kwargs):
+        evaluation_apprentissage=self.get_object()
+        evaluation_apprentissage.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT) 
+    
+    
+class CongeViewSet(ModelViewSet):
+    serializer_class= CongeSerializer
+    #permission_classes=(IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset= Conge.objects.all()
+        conge_id = self.request.GET.get('id_conge')
+        if conge_id is not None:
+            queryset = queryset.filter(id=conge_id)
+        return queryset
+    
+    
+    def destroy(self, request, *args, **kwargs):
+        conge=self.get_object()
+        conge.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT) 
 
 
 class GetTokenViewSet(ModelViewSet):
     serializer_class= CompteSerializer
     http_method_names = ["post","head"]
 
-    def create(self, request, *args, **kwargs):
 
+    def create(self, request, *args, **kwargs):
         compte_serializer=CompteSerializer(data=request.data)
         if not compte_serializer.is_valid():
             return Response({'detail': 'Données invalides'}, status = status.HTTP_400_BAD_REQUEST)
@@ -460,9 +593,10 @@ class GetTokenViewSet(ModelViewSet):
             }, status=status.HTTP_200_OK)
 
 
-#verifier le token
 class VerifyToken(ModelViewSet):
     http_method_names = ["post","head"]
+
+
     def create(self, request, *args, **kwargs):
         token=request.data["token"]
         token=Token.objects.get(key = token)
@@ -475,12 +609,9 @@ class VerifyToken(ModelViewSet):
             return Response({'info':'token invalide'},status=status.HTTP_401_UNAUTHORIZED)
 
 
-
-
-#logout user
-
 class LogOut(ModelViewSet):
     http_method_names = ["post","head"]
+
 
     def create(self, request, *args, **kwargs):
         #request.user.auth_token.delete()
@@ -488,8 +619,6 @@ class LogOut(ModelViewSet):
 
         return Response({'info':'utilisateur deconnecté'},status=status.HTTP_200_OK)
 
-
-#password reset
 
 class ResetPassword(ModelViewSet):
     http_method_names = ["post","head"]
@@ -514,9 +643,10 @@ class ResetPassword(ModelViewSet):
         return Response({'info':'Le lien pour réinitialiser votre mot de passe a été envoyé dans votre boite mail.'},status=status.HTTP_200_OK)
 
 
-
 class PasswordTokenCheck(ModelViewSet):
     http_method_names = ["post","head"]
+
+
     def create(self, request, *args, **kwargs):
         token=request.data["token"]
         uidb=request.data["uidb"]
@@ -528,10 +658,10 @@ class PasswordTokenCheck(ModelViewSet):
             return Response({'info':'token valide'},status=status.HTTP_200_OK)
 
 
-
 class SetNewPassword(ModelViewSet):
     http_method_names = ["patch","head"]
     serializer_class = SetNewPasswordSerializer
+
 
     def patch(self, request):
         print(request.data)
