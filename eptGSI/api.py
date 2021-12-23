@@ -260,7 +260,6 @@ class MembreDeptViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
 class StageViewSet(ModelViewSet):
     serializer_class= StageSerializer
     #permission_classes=(IsAuthenticated,)
@@ -509,8 +508,6 @@ class ResetPassword(ModelViewSet):
                     'Utilisez ce lien pour reinitialiser votre mot de passe \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                         'email_subject': 'Reinitialiser mot de passe.'}
-            print(absurl)
-            #TODO save the token in the database
             PasswordReset.objects.create(uidb=uidb64,key=token)
 
             Util.send_email(data)
