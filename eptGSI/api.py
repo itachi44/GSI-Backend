@@ -27,7 +27,7 @@ import time
 #les vues de l'API
 class StagiairePedagogiqueViewSet(ModelViewSet):
     serializer_class= StagiairePedagogiqueSerializer
-    permission_classes=(IsStudentAuthenticated,IsMaitreStageAuthenticated,IsFormateurAuthenticated,IsManagerAuthenticated,IsResponsableImmersionAuthenticated)
+    permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
 
@@ -664,7 +664,7 @@ class SetNewPassword(ModelViewSet):
     http_method_names = ["patch"]
     serializer_class = SetNewPasswordSerializer
 
-
+    queryset = ''
     def patch(self, request):
         print(request.data)
         serializer = self.serializer_class(data=request.data)
