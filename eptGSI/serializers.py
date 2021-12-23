@@ -602,23 +602,3 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['password', 'token', 'uidb64']
-
-    def validate(self, attrs):
-        try:
-            password = attrs.get('password')
-            token = attrs.get('token')
-            uidb64 = attrs.get('uidb64')
-
-            id = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(id=id)
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                raise AuthenticationFailed('le lien est invalide', 401)
-
-            user.set_password(password)
-            user.save()
-            #TODO changer le mot de passe du compte membre
-
-            return (user)
-        except Exception as e:
-            raise AuthenticationFailed('le lien est invalide', 401)
-        return super().validate(attrs)

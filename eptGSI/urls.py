@@ -36,8 +36,8 @@ router.register(r'verify_token', VerifyToken, basename='verify_token')
 
 #reset password
 router.register(r'reset_password', ResetPassword, basename='reset_password')
-router.register(r'password_reset/<uidb64>/token', PasswordTokenCheck, basename='password_reset_confirm')
-router.register(r'password_reset_complete/<uidb64>/token', SetNewPassword, basename='password_reset_complete')
+router.register(r'password_reset_check', PasswordTokenCheck, basename='password_reset_confirm')
+router.register(r'password_reset_complete', SetNewPassword, basename='password_reset_complete')
 
 
 

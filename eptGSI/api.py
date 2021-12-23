@@ -24,12 +24,11 @@ import os
 import time
 
 
-
 #Vues API
 
 class EtudiantViewSet(ModelViewSet):
     serializer_class= EtudiantSerializer
-    #permission_classes=(IsStudentAuthenticated,)
+    permission_classes=(IsStudentAuthenticated,)
     filter_fields=["niveau_etude","membre"]
 
     def get_queryset(self):
@@ -520,31 +519,17 @@ class ResetPassword(ModelViewSet):
 
 
 class PasswordTokenCheck(ModelViewSet):
-    def get (self, request,uidb64,token):
-        redirect_url = request.GET.get('redirect_url')
+    http_method_names = ["post","head"]
+    def create(self, request, *args, **kwargs):
+        token=request.data["token"]
+        uidb=request.data["uidb"]
+        id = smart_str(urlsafe_base64_decode(uidb))
+        user = User.objects.get(id=id)
+        if not PasswordResetTokenGenerator().check_token(user, token):
+            return Response({'info':'token invalide'},status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'info':'token valide'},status=status.HTTP_200_OK)
 
-        try:
-            id = smart_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(id=id)
-
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                if len(redirect_url) > 3:
-                    return CustomRedirect(redirect_url+'?token_valid=False')
-                else:
-                    return CustomRedirect(os.environ.get('FRONTEND_URL', '')+'?token_valid=False')
-
-            if redirect_url and len(redirect_url) > 3:
-                return CustomRedirect(redirect_url+'?token_valid=True&message=Credentials Valid&uidb64='+uidb64+'&token='+token)
-            else:
-                return CustomRedirect(os.environ.get('FRONTEND_URL', '')+'?token_valid=False')
-
-        except DjangoUnicodeDecodeError as identifier:
-            try:
-                if not PasswordResetTokenGenerator().check_token(user):
-                    return CustomRedirect(redirect_url+'?token_valid=False')
-                    
-            except UnboundLocalError as e:
-                return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SetNewPassword(ModelViewSet):
@@ -552,6 +537,17 @@ class SetNewPassword(ModelViewSet):
     serializer_class = SetNewPasswordSerializer
 
     def patch(self, request):
+        print(request.data)
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response({'success': True, 'message': 'le mot de passe a été réinitialisé avec succès.'}, status=status.HTTP_200_OK)
+        if serializer.is_valid():
+            password = serializer.validated_data['password']
+            token = serializer.validated_data['token']
+            uidb64 =serializer.validated_data['uidb64']
+            id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=id)
+            compte=Compte.objects.filter(identifiant=user.email)[0]
+            compte.mot_de_passe=password
+            user.set_password(password)
+            user.save()
+            compte.save()
+            return Response({'success': True, 'message': 'le mot de passe a été réinitialisé avec succès.'}, status=status.HTTP_200_OK)
