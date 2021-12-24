@@ -27,10 +27,9 @@ import time
 #les vues de l'API
 class StagiairePedagogiqueViewSet(ModelViewSet):
     serializer_class= StagiairePedagogiqueSerializer
-    permission_classes=[IsStudentAuthenticated | IsMaitreStageAuthenticated | IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
     filter_fields=["niveau_etude","membre"]
 
-
+    @permission_classes([IsStudentAuthenticated | IsMaitreStageAuthenticated | IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated])
     def get_queryset(self):
             queryset= StagiairePedagogique.objects.all()
             email = self.request.GET.get('email')
@@ -38,7 +37,7 @@ class StagiairePedagogiqueViewSet(ModelViewSet):
                 queryset = queryset.filter(membre__email=email)
             return queryset
 
-
+    @permission_classes([IsMaitreStageAuthenticated | IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated])
     def destroy(self, request, *args, **kwargs):
         stagiaire_pedagogique=self.get_object()
         Membre.objects.filter(email=stagiaire_pedagogique.membre.email).delete()

@@ -64,5 +64,5 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     url(r'api/', include(router.urls)),
-    url(r'^$', schema_view.with_ui('swagger', cache_timeout=None), name='documentation'),
+    url(r'^$', schema_view.with_ui('swagger', cache_timeout=0), name='documentation'),
 ]
