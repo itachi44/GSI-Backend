@@ -123,7 +123,6 @@ class CompteViewSet(ModelViewSet):
 
 class EntrepriseViewSet(ModelViewSet):
     serializer_class= EntrepriseSerializer
-    #permission_classes=(IsAuthenticated,)
     filter_fields=["nom_entreprise"]
 
     def get_queryset(self):
@@ -137,7 +136,6 @@ class EntrepriseViewSet(ModelViewSet):
 
 class ProgrammeViewSet(ModelViewSet):
     serializer_class= ProgrammeSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Programme.objects.all()
@@ -155,7 +153,6 @@ class ProgrammeViewSet(ModelViewSet):
 
 class ActiviteViewSet(ModelViewSet):
     serializer_class= ActiviteSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Activite.objects.all()
@@ -174,7 +171,6 @@ class ActiviteViewSet(ModelViewSet):
 
 class PlanningViewSet(ModelViewSet):
     serializer_class= PlanningSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Planning.objects.all()
@@ -187,7 +183,6 @@ class PlanningViewSet(ModelViewSet):
 
 class AlternanceViewSet(ModelViewSet):
     serializer_class= AlternanceSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Alternance.objects.all()
@@ -214,7 +209,6 @@ class AlternanceViewSet(ModelViewSet):
 
 class ImmersionViewSet(ModelViewSet):
     serializer_class= ImmersionSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Immersion.objects.all()
@@ -240,7 +234,6 @@ class ImmersionViewSet(ModelViewSet):
 
 class MaitreStageViewSet(ModelViewSet):
     serializer_class= MaitreStageSerializer
-    #permission_classes=(IsMaitreStageAuthenticated,)
     filter_fields=["membre"]
 
     def get_queryset(self):
@@ -263,7 +256,6 @@ class MaitreStageViewSet(ModelViewSet):
 
 class ProjetViewSet(ModelViewSet):
     serializer_class= ProjetSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Projet.objects.all()
@@ -281,7 +273,6 @@ class ProjetViewSet(ModelViewSet):
 
 class TacheViewSet(ModelViewSet):
     serializer_class= TacheSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Tache.objects.all()
@@ -301,7 +292,6 @@ class TacheViewSet(ModelViewSet):
 
 class SousTacheViewSet(ModelViewSet):
     serializer_class= SousTacheSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= SousTache.objects.all()
@@ -314,7 +304,6 @@ class SousTacheViewSet(ModelViewSet):
 
 class DestinataireViewSet(ModelViewSet):
     serializer_class= DestinataireSerializer
-    #permission_classes=(IsAuthenticated,)
     filter_fields=["label"]
 
     def get_queryset(self):
@@ -328,7 +317,6 @@ class DestinataireViewSet(ModelViewSet):
 
 class EvenementViewSet(ModelViewSet):
     serializer_class= EvenementSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Evenement.objects.all()
@@ -347,7 +335,6 @@ class EvenementViewSet(ModelViewSet):
 
 class PieceJointeViewSet(ModelViewSet):
     serializer_class= PieceJointeSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= PieceJointe.objects.all()
