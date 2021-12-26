@@ -613,7 +613,6 @@ class ManagerSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        print(self.context["request.user"])
         maitre_stage = validated_data.pop('maitre_stage')
         membre = maitre_stage.pop('membre')
         compte= membre.pop('compte')

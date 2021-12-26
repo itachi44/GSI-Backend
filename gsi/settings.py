@@ -89,10 +89,7 @@ SWAGGER_SETTINGS = {
         'patch',
         'delete'
     ],
-    'LOGIN_URL': 'rest_framework:login',
-    'LOGOUT_URL': 'rest_framework:logout',
-    'USE_SESSION_AUTH': True,
-    'is_authenticated': False,
+    'USE_SESSION_AUTH': False,
 }
 
 

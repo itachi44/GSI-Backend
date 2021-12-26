@@ -29,7 +29,17 @@ class StagiairePedagogiqueViewSet(ModelViewSet):
     serializer_class= StagiairePedagogiqueSerializer
     filter_fields=["niveau_etude","membre"]
 
-    @permission_classes([IsStudentAuthenticated | IsMaitreStageAuthenticated | IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated])
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsStudentAuthenticated | IsMaitreStageAuthenticated | IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
             queryset= StagiairePedagogique.objects.all()
             email = self.request.GET.get('email')
@@ -37,7 +47,6 @@ class StagiairePedagogiqueViewSet(ModelViewSet):
                 queryset = queryset.filter(membre__email=email)
             return queryset
 
-    @permission_classes([IsMaitreStageAuthenticated | IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated])
     def destroy(self, request, *args, **kwargs):
         stagiaire_pedagogique=self.get_object()
         Membre.objects.filter(email=stagiaire_pedagogique.membre.email).delete()
@@ -57,8 +66,19 @@ class StagiairePedagogiqueViewSet(ModelViewSet):
         
 class MembreViewSet(ModelViewSet):
     serializer_class= MembreSerializer
-    #permission_classes=(IsAuthenticated,)
     filter_fields=["nom","prenom"]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
 
     def get_queryset(self):
         queryset= Membre.objects.all()
@@ -79,8 +99,18 @@ class MembreViewSet(ModelViewSet):
 
 class CompteViewSet(ModelViewSet):
     serializer_class= CompteSerializer
-    #permission_classes=(IsAuthenticated,)
     filter_fields=["identifiant"]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Compte.objects.all()
@@ -343,7 +373,6 @@ class PieceJointeViewSet(ModelViewSet):
 
 class FormateurViewSet(ModelViewSet):
     serializer_class= FormateurSerializer
-    #permission_classes=(IsFormateurAuthenticated,)
     filter_fields=["membre"]
 
     def get_queryset(self):
@@ -366,7 +395,6 @@ class FormateurViewSet(ModelViewSet):
 
 class ManagerViewSet(ModelViewSet):
     serializer_class= ManagerSerializer
-    #permission_classes=(IsManagerAuthenticated,)
     filter_fields=["maitre_stage"]
 
     def get_queryset(self):
@@ -390,7 +418,6 @@ class ManagerViewSet(ModelViewSet):
 
 class ResponsableImmersionViewSet(ModelViewSet):
     serializer_class= ResponsableImmersionSerializer
-    #permission_classes=(IsResponsableImmersionAuthenticated,)
     filter_fields=["formateur"]
 
     def get_queryset(self):
@@ -413,7 +440,7 @@ class ResponsableImmersionViewSet(ModelViewSet):
 
 class MessageViewSet(ModelViewSet):
     serializer_class= MessageSerializer
-    #permission_classes=(IsAuthenticated,)
+
 
     def get_queryset(self):
         queryset= Message.objects.all()
@@ -432,7 +459,6 @@ class MessageViewSet(ModelViewSet):
     
 class GrilleEvaluationViewSet(ModelViewSet):
     serializer_class= GrilleEvaluationSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= GrilleEvaluation.objects.all()
@@ -450,7 +476,6 @@ class GrilleEvaluationViewSet(ModelViewSet):
 
 class CritereViewSet(ModelViewSet):
     serializer_class= CritereSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Critere.objects.all()
@@ -467,7 +492,6 @@ class CritereViewSet(ModelViewSet):
     
 class EvaluationViewSet(ModelViewSet):
     serializer_class= EvaluationSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Evaluation.objects.all()
@@ -485,7 +509,6 @@ class EvaluationViewSet(ModelViewSet):
     
 class EvaluationPartielleViewSet(ModelViewSet):
     serializer_class= EvaluationPartielleSerializer
-    #permission_classes=(IsAuthenticated,)
     filter_fields=["evaluation"]
 
     def get_queryset(self):
@@ -505,7 +528,6 @@ class EvaluationPartielleViewSet(ModelViewSet):
     
 class EvaluationFinaleViewSet(ModelViewSet):
     serializer_class= EvaluationFinaleSerializer
-    #permission_classes=(IsAuthenticated,)
     filter_fields=["evaluation"]
 
     def get_queryset(self):
@@ -525,7 +547,6 @@ class EvaluationFinaleViewSet(ModelViewSet):
       
 class EvaluationApprentissageViewSet(ModelViewSet):
     serializer_class= EvaluationApprentissageSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= EvaluationApprentissage.objects.all()
@@ -543,7 +564,6 @@ class EvaluationApprentissageViewSet(ModelViewSet):
     
 class CongeViewSet(ModelViewSet):
     serializer_class= CongeSerializer
-    #permission_classes=(IsAuthenticated,)
 
     def get_queryset(self):
         queryset= Conge.objects.all()
@@ -558,6 +578,10 @@ class CongeViewSet(ModelViewSet):
         conge.delete()
         return Response(status=status.HTTP_204_NO_CONTENT) 
 
+
+
+
+#les classes suivantes ne necessitent pas de permissions : TODO => enlever le commentaire après édition
 
 class GetTokenViewSet(ModelViewSet):
     serializer_class= CompteSerializer
