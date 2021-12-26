@@ -33,11 +33,11 @@ class StagiairePedagogiqueViewSet(ModelViewSet):
         if self.request.method == "GET":
             self.permission_classes = [IsStudentAuthenticated | IsMaitreStageAuthenticated | IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
         elif self.request.method == "POST":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
         elif self.request.method == "PUT" or self.request.method == "PATCH":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
-        elif self.request.method=="DELETE":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsStudentAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
         return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
@@ -70,13 +70,13 @@ class MembreViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.request.method == "GET":
-            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated | IsStudentAuthenticated]
         elif self.request.method == "POST":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
         elif self.request.method == "PUT" or self.request.method == "PATCH":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsFormateurAuthenticated | IsMaitreStageAuthenticated]
         elif self.request.method=="DELETE":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
         return [permission() for permission in self.permission_classes]
 
 
@@ -103,13 +103,13 @@ class CompteViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.request.method == "GET":
-            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
         elif self.request.method == "POST":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
         elif self.request.method == "PUT" or self.request.method == "PATCH":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated |IsStudentAuthenticated | IsManagerAuthenticated]
         elif self.request.method=="DELETE":
-            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated ]
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
         return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
@@ -125,6 +125,17 @@ class EntrepriseViewSet(ModelViewSet):
     serializer_class= EntrepriseSerializer
     filter_fields=["nom_entreprise"]
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= Entreprise.objects.all()
     
@@ -136,6 +147,17 @@ class EntrepriseViewSet(ModelViewSet):
 
 class ProgrammeViewSet(ModelViewSet):
     serializer_class= ProgrammeSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsStudentAuthenticated |IsMaitreStageAuthenticated | IsManagerAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsManagerAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated |IsStudentAuthenticated]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Programme.objects.all()
@@ -153,6 +175,17 @@ class ProgrammeViewSet(ModelViewSet):
 
 class ActiviteViewSet(ModelViewSet):
     serializer_class= ActiviteSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated ]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Activite.objects.all()
@@ -172,6 +205,17 @@ class ActiviteViewSet(ModelViewSet):
 class PlanningViewSet(ModelViewSet):
     serializer_class= PlanningSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated]
+        return [permission() for permission in self.permission_classes]
+        
     def get_queryset(self):
         queryset= Planning.objects.all()
     
@@ -183,6 +227,17 @@ class PlanningViewSet(ModelViewSet):
 
 class AlternanceViewSet(ModelViewSet):
     serializer_class= AlternanceSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Alternance.objects.all()
@@ -210,6 +265,17 @@ class AlternanceViewSet(ModelViewSet):
 class ImmersionViewSet(ModelViewSet):
     serializer_class= ImmersionSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsStudentAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= Immersion.objects.all()
     
@@ -236,6 +302,17 @@ class MaitreStageViewSet(ModelViewSet):
     serializer_class= MaitreStageSerializer
     filter_fields=["membre"]
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsMaitreStageAuthenticated| IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= MaitreStage.objects.all()
     
@@ -257,6 +334,17 @@ class MaitreStageViewSet(ModelViewSet):
 class ProjetViewSet(ModelViewSet):
     serializer_class= ProjetSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= Projet.objects.all()
     
@@ -273,6 +361,17 @@ class ProjetViewSet(ModelViewSet):
 
 class TacheViewSet(ModelViewSet):
     serializer_class= TacheSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsStudentAuthenticated | IsManagerAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated |IsStudentAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Tache.objects.all()
@@ -293,6 +392,17 @@ class TacheViewSet(ModelViewSet):
 class SousTacheViewSet(ModelViewSet):
     serializer_class= SousTacheSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsMaitreStageAuthenticated |IsStudentAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated |IsMaitreStageAuthenticated | IsStudentAuthenticated]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= SousTache.objects.all()
     
@@ -306,6 +416,17 @@ class DestinataireViewSet(ModelViewSet):
     serializer_class= DestinataireSerializer
     filter_fields=["label"]
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= Destinataire.objects.all()
     
@@ -317,6 +438,17 @@ class DestinataireViewSet(ModelViewSet):
 
 class EvenementViewSet(ModelViewSet):
     serializer_class= EvenementSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Evenement.objects.all()
@@ -335,6 +467,17 @@ class EvenementViewSet(ModelViewSet):
 
 class PieceJointeViewSet(ModelViewSet):
     serializer_class= PieceJointeSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= PieceJointe.objects.all()
@@ -362,6 +505,17 @@ class FormateurViewSet(ModelViewSet):
     serializer_class= FormateurSerializer
     filter_fields=["membre"]
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsFormateurAuthenticated | IsResponsableImmersionAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= Formateur.objects.all()
     
@@ -383,6 +537,17 @@ class FormateurViewSet(ModelViewSet):
 class ManagerViewSet(ModelViewSet):
     serializer_class= ManagerSerializer
     filter_fields=["maitre_stage"]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Manager.objects.all()
@@ -407,6 +572,17 @@ class ResponsableImmersionViewSet(ModelViewSet):
     serializer_class= ResponsableImmersionSerializer
     filter_fields=["formateur"]
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= ResponsableImmersion.objects.all()
         responsable_immersion_id = self.request.GET.get('id_responsable_immersion')
@@ -428,6 +604,16 @@ class ResponsableImmersionViewSet(ModelViewSet):
 class MessageViewSet(ModelViewSet):
     serializer_class= MessageSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsStudentAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsStudentAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsStudentAuthenticated]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Message.objects.all()
@@ -447,6 +633,17 @@ class MessageViewSet(ModelViewSet):
 class GrilleEvaluationViewSet(ModelViewSet):
     serializer_class= GrilleEvaluationSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= GrilleEvaluation.objects.all()
         grille_id = self.request.GET.get('id_grille')
@@ -464,6 +661,17 @@ class GrilleEvaluationViewSet(ModelViewSet):
 class CritereViewSet(ModelViewSet):
     serializer_class= CritereSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= Critere.objects.all()
         critere_id = self.request.GET.get('id_critere')
@@ -479,6 +687,17 @@ class CritereViewSet(ModelViewSet):
     
 class EvaluationViewSet(ModelViewSet):
     serializer_class= EvaluationSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsMaitreStageAuthenticated]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= Evaluation.objects.all()
@@ -497,6 +716,17 @@ class EvaluationViewSet(ModelViewSet):
 class EvaluationPartielleViewSet(ModelViewSet):
     serializer_class= EvaluationPartielleSerializer
     filter_fields=["evaluation"]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsMaitreStageAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         queryset= EvaluationPartielle.objects.all()
@@ -517,6 +747,17 @@ class EvaluationFinaleViewSet(ModelViewSet):
     serializer_class= EvaluationFinaleSerializer
     filter_fields=["evaluation"]
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= EvaluationFinale.objects.all()
         evaluation_finale_id = self.request.GET.get('id_evaluation_finale')
@@ -535,6 +776,17 @@ class EvaluationFinaleViewSet(ModelViewSet):
 class EvaluationApprentissageViewSet(ModelViewSet):
     serializer_class= EvaluationApprentissageSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsResponsableImmersionAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsResponsableImmersionAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= EvaluationApprentissage.objects.all()
         evaluation_apprentissage_id = self.request.GET.get('id_evaluation_apprentissage')
@@ -552,6 +804,17 @@ class EvaluationApprentissageViewSet(ModelViewSet):
 class CongeViewSet(ModelViewSet):
     serializer_class= CongeSerializer
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            self.permission_classes = [IsFormateurAuthenticated | IsManagerAuthenticated | IsResponsableImmersionAuthenticated | IsStudentAuthenticated | IsMaitreStageAuthenticated]
+        elif self.request.method == "POST":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated ]
+        elif self.request.method == "PUT" or self.request.method == "PATCH":
+            self.permission_classes= [IsMaitreStageAuthenticated | IsManagerAuthenticated]
+        elif self.request.method=="DELETE":
+            self.permission_classes= [IsManagerAuthenticated | IsMaitreStageAuthenticated ]
+        return [permission() for permission in self.permission_classes]
+
     def get_queryset(self):
         queryset= Conge.objects.all()
         conge_id = self.request.GET.get('id_conge')
@@ -565,10 +828,6 @@ class CongeViewSet(ModelViewSet):
         conge.delete()
         return Response(status=status.HTTP_204_NO_CONTENT) 
 
-
-
-
-#les classes suivantes ne necessitent pas de permissions : TODO => enlever le commentaire après édition
 
 class GetTokenViewSet(ModelViewSet):
     serializer_class= CompteSerializer
